@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details</title>
+    {% load static %}
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .product-details-container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .column {
+            flex: 50%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .image-column {
+            text-align: center;
+        }
+
+        .product-details-column {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .product-details {
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .graph-section {
+            margin-top: 20px;
+            padding: 20px;
+            border-top: 1px solid #ccc;
+        }
+
+        .graph {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .product-image {
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+        }
+
+        .buy-btn {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 10px 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="product-details-container">
+        <div class="column image-column">
+            <img class="product-image" src="{{ product.image }}" alt="Product Image">
+        </div>
+        <div class="column product-details-column">
+            <div class="product-details">
+                <h2>{{ product.title }}</h2>
+                <p style="font-weight: 600; font-size: 2rem;">Price: {{ product.price_set.get.price }}</p>
+                <p style="font-weight: 600; font-size: 1rem;">Availability: In Stock</p>
+                <button class="buy-btn">buy</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="graph-section">
+        <h2>Price Graph</h2>
+        <div class="graph">
+            <!-- Your graph code goes here -->
+            <img src="{% static 'main/images/graph.jpg' %}" alt="Graph Image">
+        </div>
+    </div>
+
+</body>
+
+</html>

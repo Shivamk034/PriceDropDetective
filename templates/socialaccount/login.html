@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'main/styles.css' %}">
+    <title>Price Drop Detective</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Price Drop Detective</h1>
+        <form method="post">
+            <div class="justify-center mx-3">
+                {% csrf_token %}
+                <button type="submit" class="login-button">Login</button>
+            </div>
+        </form>
+    
+    </div>
+</body>
+</html>
+   
