@@ -81,7 +81,9 @@
                 <h2>{{ product.title }}</h2>
                 <p style="font-weight: 600; font-size: 2rem;">Price: {{ product.price_set.get.price }}</p>
                 <p style="font-weight: 600; font-size: 1rem;">Availability: In Stock</p>
-                <button class="buy-btn">buy</button>
+                <a href="{{ product.url  }}">
+                    <button class="buy-btn">buy</button>
+                </a>
             </div>
         </div>
     </div>

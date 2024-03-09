@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,16 +8,17 @@
     <link rel="stylesheet" href="{% static 'main/styles.css' %}">
     <title>Dashboard</title>
 </head>
+
 <body>
     <div class="navbar">
         <span>Welcome, <strong> {{ user|capfirst }} </strong></span>
     </div>
-    
+
     <div class="product-container">
         <h2>Welcome To Price Drop Detective</h2>
         <strong style="color: red;">{{ error }}</strong>
         <form id="userDetailsForm" method="post" action="{% url 'add' %}">
-            {% csrf_token  %}
+            {% csrf_token %}
             <label for="productLink">Product Link:</label>
             <input type="text" id="productLink" name="url" required><br>
             <!-- <label for="minPrice">Minimum Price:</label>
@@ -25,7 +27,16 @@
             <input type="number" id="maxPrice" name="maxPrice" required><br> -->
             <button class="add-button">Add</button>
         </form>
+
+        <div class="or_banner" style="text-align:center">OR</div>
+        <div class="all_products_banner" style="text-align:center">
+            <a href="{% url 'all_products' %}">
+            click here to check your tracked products
+            </a>
+        </div>
+
     </div>
 
-    </body>
+</body>
+
 </html>

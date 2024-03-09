@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'main/styles.css' %}">
+    <title>Dashboard</title>
+</head>
+
+<body>
+    <div class="card_container">
+        {% for product in products %}
+
+            <a class="card" href="{% url 'detail' id=product.id %}">
+
+                <img class="card__image""" src="{{ product.image }}" alt="">
+                <p class="card__title">{{ product.title }}</p>
+                <p class="card__price">{{ product.price_set.get.price }}</p>
+            </a>
+
+        {% endfor %}
+    </div>
+</body>
+
+</html>

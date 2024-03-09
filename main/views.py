@@ -28,9 +28,14 @@ def add_product(request):
 
     elif(request.method=="POST"):
         print(request.POST)
-        scrapper = getScrapper(request.POST["url"])
-        if(scrapper==None):
+
+        try:
+            scrapper = getScrapper(request.POST["url"])
+        except:
             return render(request,"main/main_screen.html",context={"error":"invalid url"})
+    
+        if(scrapper==None):
+            return render(request,"main/main_screen.html",context={"error":"unsupported url"})
 
             
         data = scrapper.getData()
@@ -66,3 +71,9 @@ def add_product(request):
 def product_detail(request,id):
     product = get_object_or_404(Product,id=id)
     return render(request,"main/product_detail_screen.html",context={"product":product})
+
+@login_required(login_url="/")
+def all_products(request):
+    products = Product.objects.filter(user=request.user)
+    
+    return render(request,"main/all_products.html",context={"products":products})
