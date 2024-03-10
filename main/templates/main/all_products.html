@@ -9,19 +9,30 @@
     <title>Dashboard</title>
 </head>
 
-<body>
+<body class="all_products">
+    <h1>Products</h1>
     <div class="card_container">
         {% for product in products %}
 
+        <div class=card_wrapper>
             <a class="card" href="{% url 'detail' id=product.id %}">
 
-                <img class="card__image""" src="{{ product.image }}" alt="">
+                <img class="card__image" src="{{ product.image }}" alt="">
                 <p class="card__title">{{ product.title }}</p>
-                <p class="card__price">{{ product.price_set.get.price }}</p>
+                <p class="card__price">{{ product.price_set.last.price }}</p>
             </a>
-
+            <button class="remove-btn" data-id="{{product.id}}">
+                X
+            </button>
+        </div>
         {% endfor %}
     </div>
+
+    <script>
+        var csrf_token = "{{ csrf_token }}";
+        var delete_url = "{% url 'delete_product' id=0 %}".slice(0,-1); 
+    </script>
+    <script src="{% static 'main/all_products.js' %}"></script>
 </body>
 
 </html>

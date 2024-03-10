@@ -4,6 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from scraper.scraper import *
 from .models import Product,Price
+import json
+# from . import scheduled_jobs
 
 def getScrapper(url):
     if("amazon" in url.lower()):
@@ -29,6 +31,10 @@ def add_product(request):
     elif(request.method=="POST"):
         print(request.POST)
 
+        old_prod = Product.objects.filter(user=request.user,url=request.POST["url"])
+        if (len(old_prod)>0):
+            return render(request,"main/main_screen.html",context={"error":"already tracking this url"})
+        
         try:
             scrapper = getScrapper(request.POST["url"])
         except:
@@ -77,3 +83,12 @@ def all_products(request):
     products = Product.objects.filter(user=request.user)
     
     return render(request,"main/all_products.html",context={"products":products})
+
+
+@login_required(login_url="/")
+def delete_product(request,id):
+    if request.method=="POST":
+        product = get_object_or_404(Product,id=id)
+        product.delete() 
+
+        return HttpResponse(status=204)

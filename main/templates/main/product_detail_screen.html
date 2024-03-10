@@ -79,7 +79,7 @@
         <div class="column product-details-column">
             <div class="product-details">
                 <h2>{{ product.title }}</h2>
-                <p style="font-weight: 600; font-size: 2rem;">Price: {{ product.price_set.get.price }}</p>
+                <p style="font-weight: 600; font-size: 2rem;">Price: {{ product.price_set.last.price }}</p>
                 <p style="font-weight: 600; font-size: 1rem;">Availability: In Stock</p>
                 <a href="{{ product.url  }}">
                     <button class="buy-btn">buy</button>
@@ -95,7 +95,19 @@
             <img src="{% static 'main/images/graph.jpg' %}" alt="Graph Image">
         </div>
     </div>
+    
 
+<script>
+    var prices_obj = [ 
+        {% for price in product.price_set.all %}
+        {
+            price:"{{ price.price }}", 
+            time:"{{ price.timestamp }}", 
+        },
+        {% endfor %}
+    ];
+    console.log(prices_obj)
+</script>
 </body>
 
 </html>

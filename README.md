@@ -4,6 +4,6 @@
 
 - [X] google login
 - [X] make url scraping working
-- [ ] make all products page
-- [ ] make scheduler for scrapping automatically
+- [X] make all products page
+- [X] make scheduler for scrapping automatically
 - [ ] improve UI

@@ -11,6 +11,9 @@ class Product(models.Model):
     title = models.CharField(max_length=300)
     image = models.CharField(max_length=300)
 
+    class Meta:
+        unique_together = [['user', 'url']]
+
 class Price(models.Model):
     
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
