@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from scraper.scraper import *
-from .models import Product,Price
+from .models import Product,Price,Track
 import json
 # from . import scheduled_jobs
 
@@ -31,7 +31,7 @@ def add_product(request):
     elif(request.method=="POST"):
         print(request.POST)
 
-        old_prod = Product.objects.filter(user=request.user,url=request.POST["url"])
+        old_prod = Product.objects.filter(url=request.POST["url"])
         if (len(old_prod)>0):
             return render(request,"main/main_screen.html",context={"error":"already tracking this url"})
         
@@ -45,18 +45,34 @@ def add_product(request):
 
             
         data = scrapper.getData()
-
+        print(data)
+        # html = str(scrapper.soup.prettify())
+        # # print(html)
+        # res = {"html": html}
+        # json_data = json.dumps(res)
+        # return HttpResponse(json_data, content_type = "application/json")
         if(data["title"]==None):
+            print("title error")
+            # return HttpResponse(scrapper.soup)
             return render(request,"main/main_screen.html",context={"error":"Failed to fetch data"})
         if(data["price"]==None):
+            print("price error")
+            # return HttpResponse(scrapper.soup)
+            # return HttpResponse(json.dumps({"html": scrapper.soup}))
             return render(request,"main/main_screen.html",context={"error":"Failed to fetch data"})
         if(data["image"]==None):
+            print("image error")
+            # return HttpResponse(scrapper.soup)
+            # return HttpResponse(json.dumps({"html": scrapper.soup}))
             return render(request,"main/main_screen.html",context={"error":"Failed to fetch data"})
 
+        # document.querySelector("span.a-price span");
+        print("price:",data["price"])
+        if(data["price"].strip(" ")==""):
+            return HttpResponse(scrapper.soup)
         # save product
         # print(request.user)
         product = Product(
-            user=request.user,
             url=request.POST["url"],
             title=data["title"],
             image=data["image"]
@@ -64,11 +80,15 @@ def add_product(request):
         
         product.save()
 
+        # save track
+        track = Track(user=request.user,product=product)
+        track.save()
+        
+        # save price
         price = Price(
             product=product,
             price=data['price']
         )
-
         price.save()
 
         return redirect(reverse("detail",kwargs={"id":product.id}))
@@ -80,7 +100,8 @@ def product_detail(request,id):
 
 @login_required(login_url="/")
 def all_products(request):
-    products = Product.objects.filter(user=request.user)
+    tracks = Track.objects.filter(user=request.user) 
+    products = [track.product for track in tracks]
     
     return render(request,"main/all_products.html",context={"products":products})
 
@@ -88,7 +109,9 @@ def all_products(request):
 @login_required(login_url="/")
 def delete_product(request,id):
     if request.method=="POST":
-        product = get_object_or_404(Product,id=id)
-        product.delete() 
+        track = get_object_or_404(Track,product__id=id)
+        track.delete() 
 
         return HttpResponse(status=204)
+
+

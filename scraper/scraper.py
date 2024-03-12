@@ -54,7 +54,9 @@ class AmazonScrapper(BaseScrapper):
     
     def getPrice(self):
         try:
-            return self.soup.find("span",{"class":"a-price"}).find("span").text
+            return self.soup.find("div", {'id': "corePriceDisplay_desktop_feature_div"}).find("div", {"class": "a-section"}).find("span",{"class":"a-price"}).text
+            # return self.soup.find("form",{"id":"addToCart"}).find("span",{"class":"a-price"}).find("span").text
+        #return self.souperySelector("form#addToCart span.a-price span")find("form",{"id":"addToCart"}).find("span",{"class":"a-price"}).find("span").text
         except Exception as e:
             print(e)
 

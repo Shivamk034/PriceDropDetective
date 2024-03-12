@@ -16,5 +16,5 @@ function deleteProduct(btn){
             btn.closet(".card_wrapper").remove();
         }
     })
-    btn.closest(".card_wrapper").remove();
+    // btn.closest(".card_wrapper").remove();
 }

@@ -105,6 +105,16 @@ input[type="submit"]:hover {
     margin:0.5em 0;
 }
 
+
+.expand{
+    width:100%;
+    min-height:100vh;
+}
+
+.expand>h1{
+    text-align:center;
+}
+
 .all_products_banner{
     /* font-size:1.1em; */
     font-weight: 500;
