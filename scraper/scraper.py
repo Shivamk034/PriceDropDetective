@@ -1,34 +1,39 @@
-import requests
-from bs4 import BeautifulSoup
-import random
 from abc import ABC, abstractmethod 
 from selenium import webdriver
-
+from selenium.webdriver.common.by import By
 
 chrome_options = webdriver.ChromeOptions() # Create object ChromeOptions()
 chrome_options.add_argument('--headless')           
 chrome_options.add_argument('--no-sandbox')                             
 chrome_options.add_argument('--disable-dev-shm-usage')
 chrome_options.add_argument("--log-level=3")
-driver= webdriver.Chrome(options=chrome_options) # Create driver
+chrome_options.add_argument('--ignore-certificate-errors')
+chrome_options.add_argument('--incognito')
 
-
-def getSoup(url):
-    
-    driver.get(url)
-    html = driver.page_source
-
-    soup = BeautifulSoup(html, 'html.parser')
-
-    return soup
+# Set up the Chrome driver
+driver = webdriver.Chrome(options=chrome_options)
 
 
 class BaseScrapper(ABC):
     def __init__(self,url):
-        self.soup = getSoup(url)
+        self.updateUrl(url)
 
+    @classmethod
+    def getBaseUrl(cls,url):
+        return "/".join(url.split("/",3)[:3])+"/"
+
+    @classmethod
+    def getShortUrl(cls,url):
+        return url
+    
     def updateUrl(self,url):
-        self.soup = getSoup(url)
+        self.url=url
+        driver.get(url)
+
+    def getHTML(self):
+        return driver.page_source.encode("UTF-8")
+
+
 
     @abstractmethod
     def getPrice(self):
@@ -41,31 +46,45 @@ class BaseScrapper(ABC):
     @abstractmethod
     def getImage(self):
         pass
+
+
+
+def error_handler(f):
+    def exec(*args,**kwargs):
+        try:
+            return f(*args,**kwargs)
+        except Exception as e:
+            print(e)
+
+    return exec
 
 class AmazonScrapper(BaseScrapper):
     def __init__(self,url):
         super().__init__(url)
+
+    @staticmethod
+    def _get_asin(url):
+        parts = url.split("/dp/",1)[-1].split("/",1)
+        return parts[0] if isinstance(parts,list) else parts
     
+    
+    @classmethod
+    def getShortUrl(cls,url):
+        asin = cls._get_asin(url)
+        return cls.getBaseUrl(url) + 'dp/' + asin
+    
+    @error_handler
     def getTitle(self):
-        try:
-            return self.soup.find('span',{'id':'productTitle'}).text.strip()
-        except Exception as e:
-            print(e)
+        return driver.find_element(By.XPATH, '//*[@id="productTitle"]').text
     
+    @error_handler
     def getPrice(self):
-        try:
-            return self.soup.find("div", {'id': "corePriceDisplay_desktop_feature_div"}).find("div", {"class": "a-section"}).find("span",{"class":"a-price"}).text
-            # return self.soup.find("form",{"id":"addToCart"}).find("span",{"class":"a-price"}).find("span").text
-        #return self.souperySelector("form#addToCart span.a-price span")find("form",{"id":"addToCart"}).find("span",{"class":"a-price"}).find("span").text
-        except Exception as e:
-            print(e)
-
+        return driver.find_element(By.XPATH, '//*[@id="corePriceDisplay_desktop_feature_div"]/div[1]/span[3]/span[2]').text
+        
+    @error_handler
     def getImage(self):
-        try:
-            return self.soup.find("div",{"id":"imgTagWrapperId"}).find("img",{"id":"landingImage"}).attrs["src"]
-        except Exception as e:
-            print(e)
-
+        return driver.find_element(By.XPATH, '//*[@id="landingImage"]').get_attribute('src')
+        
     def getData(self):
         return {
             "title":self.getTitle(),
@@ -77,25 +96,26 @@ class FlipkartScrapper(BaseScrapper):
     def __init__(self,url):
         super().__init__(url)
     
-    def getTitle(self):
-        try:
-            return self.soup.find("span",{'class': 'B_NuCI'}).text
-        except Exception as e:
-            print(e)
+    @classmethod
+    def getShortUrl(cls,url):
+        return url.split("?",1)[0]
     
+    @error_handler
+    def getTitle(self):
+        # return driver.find_element(By.XPATH, '//*[@id="container"]/div/div[3]/div[1]/div[2]/div[2]/div/div[1]/h1/span[2]').text
+        return driver.find_element(By.CSS_SELECTOR,"span.B_NuCI").text
+
+        
+    @error_handler
     def getPrice(self):
-        try:
-            return self.soup.find('div', {'class' : '_25b18c'}).find('div', {'class' : '_30jeq3'}).text
-        except Exception as e:
-            print(e)
+        return driver.find_element(By.CSS_SELECTOR,"div._25b18c div._30jeq3").text
 
+    
+    @error_handler
     def getImage(self):
-        try:
-            return self.soup.find("div",{"class":"_3kidJX"}).find("img").attrs['src']
-        except Exception as e:
-            print(e)
-        # return "unknown"
+        return driver.find_element(By.CSS_SELECTOR,"div._3kidJX img").get_attribute("src")
 
+        
     def getData(self):
         return {
             "title":self.getTitle(),
@@ -104,13 +124,27 @@ class FlipkartScrapper(BaseScrapper):
         }
 
 if __name__ == "__main__":
-
-    scrapper = AmazonScrapper("https://www.amazon.in/iQOO-Storage-Snapdragon%C2%AE-Platform-Flagship/dp/B07WHQRN1B/ref=sr_1_1?crid=19L7NK8R9STI6&dib=eyJ2IjoiMSJ9.OyUzPuZTCZl1GjdKSaEht0L5iHqOCtl-qUqVHjB6KPDI9zLiFSc5VmT34CHkKQINfBf94NApKuzWo2QoyxKLUPRH6ecxpW7VAC3hSLCIzpH4TBInhWvEuCckhzZIXE3kKFrX6WO-KNV9OQCFFzTzqBYHao8lJwwAZWlgCHrELQEpsi_OGMyFishmbm58St43Z4IC7kgfuqq6pXMNEhplkRczJe6YdFxoUzUO-Jyo0r8.k0Z4BCtCDigPS7Jmk1eXUxUlkC15zJqnaoD6FUZA_8U&dib_tag=se&keywords=iqoo%2B12%2Bpro&qid=1709395711&sprefix=iq%2Caps%2C228&sr=8-1&th=1")
-    # scrapper = FlipkartScrapper('https://www.flipkart.com/sti-printed-men-round-neck-white-black-t-shirt/p/itm3b20cdb30cb02?pid=TSHGU4KZKMHZ75TZ&lid=LSTTSHGU4KZKMHZ75TZIQFLW0&marketplace=FLIPKART&q=tsgirt&store=clo%2Fash%2Fank&spotlightTagId=BestsellerId_clo%2Fash%2Fank&srno=s_1_3&otracker=search&otracker1=search&fm=Search&iid=3e35c42e-3955-4e82-aa28-c33989a3cc19.TSHGU4KZKMHZ75TZ.SEARCH&ppt=sp&ppn=sp&ssid=n2l1kptmxc0000001709397145260&qH=8d2cb22c633b1858')
+    # https://www.amazon.in/dp/B07WHQRN1B/
+    # https://www.flipkart.com/p/itm3b20cdb30cb02
+    url = "https://www.amazon.in/dp/B07WHQRN1B/"
+    scrapper = AmazonScrapper(AmazonScrapper.getShortUrl(url))
+    print(scrapper.url)
     print(scrapper.getData())
 
-    scrapper.updateUrl("https://www.amazon.in/dp/B0CHM745CT/ref=syn_sd_onsite_desktop_0?ie=UTF8&pd_rd_plhdr=t&aref=94rDEQyVIg&th=1")
+    url = "https://www.amazon.in/dp/B0CHM745CT/ref=syn_sd_onsite_desktop_0?ie=UTF8&pd_rd_plhdr=t&aref=94rDEQyVIg&th=1"
+    scrapper.updateUrl(AmazonScrapper.getShortUrl(url))
+    
+    print(scrapper.url)
     print(scrapper.getData())
 
-    scrapper = FlipkartScrapper('https://www.flipkart.com/sti-printed-men-round-neck-white-black-t-shirt/p/itm3b20cdb30cb02?pid=TSHGU4KZKMHZ75TZ&lid=LSTTSHGU4KZKMHZ75TZIQFLW0&marketplace=FLIPKART&q=tsgirt&store=clo%2Fash%2Fank&spotlightTagId=BestsellerId_clo%2Fash%2Fank&srno=s_1_3&otracker=search&otracker1=search&fm=Search&iid=3e35c42e-3955-4e82-aa28-c33989a3cc19.TSHGU4KZKMHZ75TZ.SEARCH&ppt=sp&ppn=sp&ssid=n2l1kptmxc0000001709397145260&qH=8d2cb22c633b1858')
+    url = 'https://www.flipkart.com/apple-iphone-15-blue-128-gb/p/itmbf14ef54f645d?pid=MOBGTAGPAQNVFZZY&lid=LSTMOBGTAGPAQNVFZZYO7HQ2L&marketplace=FLIPKART&store=tyy%2F4io&spotlightTagId=BestsellerId_tyy%2F4io&srno=b_1_1&otracker=browse&fm=organic&iid=fedd7fea-5ff7-4bd7-a5f0-a9008f1702c3.MOBGTAGPAQNVFZZY.SEARCH&ppt=browse&ppn=browse&ssid=7un6hxsq6o0000001710258321538'
+    scrapper = FlipkartScrapper(FlipkartScrapper.getShortUrl(url))
+    open("index.html","wb").write(scrapper.getHTML())
+    print(scrapper.url)
+    print(scrapper.getData())
+
+    url = "https://www.flipkart.com/sti-printed-men-round-neck-white-black-t-shirt/p/itm3b20cdb30cb02"
+    scrapper.updateUrl(FlipkartScrapper.getShortUrl(url))
+    
+    print(scrapper.url)
     print(scrapper.getData())

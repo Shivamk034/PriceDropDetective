@@ -12,9 +12,9 @@ function deleteProduct(btn){
             "X-CSRFToken": csrf_token
         },
     }).then(res=>{
+        console.log(res.status);
         if(res.ok){
-            btn.closet(".card_wrapper").remove();
+            btn.closest(".card_wrapper").remove();
         }
     })
-    // btn.closest(".card_wrapper").remove();
 }
