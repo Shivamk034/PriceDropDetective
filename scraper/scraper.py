@@ -79,7 +79,23 @@ class AmazonScrapper(BaseScrapper):
     
     @error_handler
     def getPrice(self):
-        return driver.find_element(By.XPATH, '//*[@id="corePriceDisplay_desktop_feature_div"]/div[1]/span[3]/span[2]').text
+        # return driver.find_element(By.CLASS_NAME, "a-price-whole").text
+        # return driver.find_element(By.CSS_SELECTOR,"div#corePriceDisplay_desktop_feature_div div.a-section span.a-price").text
+        try:
+            # driver.find_element(By.CLASS_NAME,"a-price-decimal")
+            # a-price-symbol, a-price-whole, a-price-decimal, a-price-fraction
+            symbol= driver.find_element(By.CLASS_NAME,"a-price-symbol").text
+            whole= driver.find_element(By.CLASS_NAME,"a-price-whole").text
+            decimal= '.'
+            fraction= driver.find_element(By.CLASS_NAME,"a-price-fraction").text
+            return symbol + whole + decimal + fraction
+        except:
+            return driver.find_element(By.XPATH, '//*[@id="corePriceDisplay_desktop_feature_div"]/div[1]/span[3]/span[2]').text 
+        # corePrice_desktop > div > table > tbody > tr > td.a-span12 > span.a-price.a-text-price.a-size-medium.apexPriceToPay > span:nth-child(2)
+        # return driver.find_element(By.CSS_SELECTOR,"div#corePriceDisplay_desktop_feature_div div.a-section span.a-price").text
+        # return self.soup.find("div", {'id': "corePriceDisplay_desktop_feature_div"}).find("div", {"class": "a-section"}).find("span",{"class":"a-price"}).text
+
+        # document.querySelector("#corePriceDisplay_desktop_feature_div > div.a-section.a-spacing-none.aok-align-center.aok-relative > span.a-price.aok-align-center.reinventPricePriceToPayMargin.priceToPay > span:nth-child(2)").textContent
         
     @error_handler
     def getImage(self):
@@ -126,12 +142,15 @@ class FlipkartScrapper(BaseScrapper):
 if __name__ == "__main__":
     # https://www.amazon.in/dp/B07WHQRN1B/
     # https://www.flipkart.com/p/itm3b20cdb30cb02
-    url = "https://www.amazon.in/dp/B07WHQRN1B/"
+    # url = "https://www.amazon.in/dp/B07WHQRN1B/"
+    url = "https://www.amazon.com/dp/B088SKYMF2"
     scrapper = AmazonScrapper(AmazonScrapper.getShortUrl(url))
     print(scrapper.url)
     print(scrapper.getData())
 
-    url = "https://www.amazon.in/dp/B0CHM745CT/ref=syn_sd_onsite_desktop_0?ie=UTF8&pd_rd_plhdr=t&aref=94rDEQyVIg&th=1"
+    url = "https://www.amazon.com/Hope-Rainbow-Hoda-Kotb/dp/0593624122/?_encoding=UTF8&_encoding=UTF8&ref_=dlx_gate_sd_dcl_tlt_fa13649f_dt_pd_gw_unk&pd_rd_w=FPLOl&content-id=amzn1.sym.81a68cec-8afc-4296-99f7-78cf5ddc15b5&pf_rd_p=81a68cec-8afc-4296-99f7-78cf5ddc15b5&pf_rd_r=KAD1QPN234SH5MXYBNW6&pd_rd_wg=A7ZKi&pd_rd_r=fa39bbc3-93b1-41a2-b592-77d89dfc6566"
+    # url = "https://www.amazon.in/Lux-Cozi-Melange-Regular-Sleeves/dp/B0CH9QMFF4/ref=sl_ob_desktop_dp_0_2_v2?_encoding=UTF8&pd_rd_w=1Bm0J&content-id=amzn1.sym.cdbcd11c-3329-43cb-9547-fb297b2c655b&pf_rd_p=cdbcd11c-3329-43cb-9547-fb297b2c655b&pf_rd_r=PTKWAM93FTVZKNGQFPVM&pd_rd_wg=iE7ky&pd_rd_r=ccfc3bd0-e267-435c-85d3-f63c78a1db0a"
+    # url = "https://www.amazon.in/dp/B0CHM745CT/ref=syn_sd_onsite_desktop_0?ie=UTF8&pd_rd_plhdr=t&aref=94rDEQyVIg&th=1"
     scrapper.updateUrl(AmazonScrapper.getShortUrl(url))
     
     print(scrapper.url)
@@ -148,3 +167,13 @@ if __name__ == "__main__":
     
     print(scrapper.url)
     print(scrapper.getData())
+
+"""
+<span>
+"15"
+<span> . </span>
+</span>
+
+<span>$324.34</span>
+
+"""

@@ -58,7 +58,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
     'allauth.account.middleware.AccountMiddleware',
 ]
 
@@ -150,7 +149,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = '/add/'
 SITE_ID = 1
 ACCOUNT_EMAIL_VERIFICATION = "none" # added later
-
+ACCOUNT_EMAIL_REQUIRED = True
 
 # Provider specific settings
 SOCIALACCOUNT_PROVIDERS = {

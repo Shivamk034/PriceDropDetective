@@ -24,7 +24,7 @@ def home(request):
 
 @login_required(login_url="/")
 def add_product(request):
-    
+
     if(request.method=="GET"):
         return render(request,"main/main_screen.html",context={})
 
@@ -60,13 +60,7 @@ def add_product(request):
             track = Track(user=request.user,product=old_prod[0])
             track.save()
             return redirect(reverse("detail",kwargs={"id":old_prod[0].id}))
-
-        
-        
     
-        
-
-            
         data = scrapper.getData()
         # print(data)
         # html = str(scrapper.soup.prettify())
