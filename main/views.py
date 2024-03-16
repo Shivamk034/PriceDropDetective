@@ -43,17 +43,17 @@ def add_product(request):
             # if we were unable to get the short url
             return render(request,"main/main_screen.html",context={"error":"invalid url"})
             
-        try:
-            scrapper = scrapperClass(url)
-        except:
-            return render(request,"main/main_screen.html",context={"error":"invalid url"})
-        
-
         # check if already tracking
         track = Track.objects.filter(user=request.user,product__url=url)
         if(len(track)>0):
             return render(request,"main/main_screen.html",context={"error":"already tracking this url"})
-
+        
+        driver = getDriver() 
+        try:
+            scrapper = scrapperClass(driver,url)
+        except:
+            return render(request,"main/main_screen.html",context={"error":"invalid url"})
+        
         # check if product is already tracked by someone
         old_prod = Product.objects.filter(url=url)
         if (len(old_prod)>0):
@@ -62,25 +62,17 @@ def add_product(request):
             return redirect(reverse("detail",kwargs={"id":old_prod[0].id}))
     
         data = scrapper.getData()
+        driver.close()
         # print(data)
-        # html = str(scrapper.soup.prettify())
-        # # print(html)
-        # res = {"html": html}
-        # json_data = json.dumps(res)
-        # return HttpResponse(json_data, content_type = "application/json")
+
         if(data["title"]==None):
             print("title error")
-            # return HttpResponse(scrapper.soup)
             return render(request,"main/main_screen.html",context={"error":"Failed to fetch data"})
         if(data["price"]==None):
             print("price error")
-            # return HttpResponse(scrapper.soup)
-            # return HttpResponse(json.dumps({"html": scrapper.soup}))
             return render(request,"main/main_screen.html",context={"error":"Failed to fetch data"})
         if(data["image"]==None):
             print("image error")
-            # return HttpResponse(scrapper.soup)
-            # return HttpResponse(json.dumps({"html": scrapper.soup}))
             return render(request,"main/main_screen.html",context={"error":"Failed to fetch data"})
 
         
@@ -127,6 +119,3 @@ def delete_product(request,id):
         track.delete() 
 
         return HttpResponse(status=204)
-
-
-# https://www.amazon.in/dp/B08R1PP5ZY/

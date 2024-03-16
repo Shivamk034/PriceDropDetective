@@ -1,48 +1,77 @@
 import smtplib, ssl
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 import os
 from dotenv import load_dotenv
 load_dotenv()
 
-# port = 465  # For SSL
-# smtp_server = "smtp.gmail.com"
-# sender_email = os.environ["SENDER_EMAIL"]
-# password = os.environ["SENDER_EMAIL_PASSWORD"]
 
-# def send_email(receiver_email,message):
-#     print("SENDING EMAIL")
-#     context = ssl.create_default_context()
-#     with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-#         server.login(sender_email, password)
-#         server.sendmail(sender_email, receiver_email, message)
- 
-#     print("SEND EMAIL")
 
-# if __name__=="__main__":
-#     receiver_email = ""  # Enter receiver address
-#     message = """\
-#     Subject: Hi there
 
-#     This message is sent from Python."""
+sender_email = os.environ["SENDER_EMAIL"]
+sender_password = os.environ["SENDER_EMAIL_PASSWORD"]
 
-#     send_email(message=message,receiver_email=receiver_email)
+def send_email(subject:str, body:str, recipients:list|str):
+    if(isinstance(recipients,str)): recipients = [recipients]
+    
+    
+    
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp_server:
+       smtp_server.login(sender_email, sender_password)
+       
+       for recipient in recipients: # loop through the recipients List
+            print("SENDING EMAIL")
+            message = MIMEMultipart()  # Create user object
+            message['Subject'] = subject
+            message['From'] = sender_email
+            message.attach(MIMEText(body, "plain"))
+            message['To'] = recipient
 
-# Import smtplib for the actual sending function
-import smtplib
+            # print(message.as_string())
+            
+            smtp_server.sendmail(sender_email, recipient, message.as_string())
+            
+            print("Message sent!")
 
-# Import the email modules we'll need
-from email.message import EmailMessage
 
-# Open the plain text file whose name is in textfile for reading.
-msg = EmailMessage()
-msg.set_content("Hello!!!!!")
 
-# me == the sender's email address
-# you == the recipient's email address
-msg['Subject'] = f'The contents of {'textfile'}'
-msg['From'] = os.environ["SENDER_EMAIL"]
-msg['To'] = ''
+def get_template_price_drop_email(name,product_name,product_url,previous_price,new_price,product_detail_url):
 
-# Send the message via our own SMTP server.
-s = smtplib.SMTP('localhost')
-s.send_message(msg)
-s.quit()
+    prod_name_len = 20
+    subject = f""" Price Drop Alert!  | {product_name[:prod_name_len]+("..." if len(product_name)>prod_name_len else "")}"""
+    body = f""" 
+    Hello, {name}
+    
+    We are excited to inform you that the price of the product you have been monitoring has dropped!
+
+    Product Name: {product_name}
+    Previous Price: {previous_price}
+    New Price: {new_price}
+    Buy Product: {product_url}
+    Product Detail: {product_detail_url}
+
+    Hurry up and grab this opportunity before the price changes again!
+
+    Thank you for using Price Drop Detective!
+
+    Best regards,
+    Your Price Drop Detective Team
+ """
+
+    return {
+        "subject":subject,
+        "body":body,
+    }
+
+# template =get_template_price_drop_email(name,product_name,product_url,previous_price,new_price,product_detail_url)
+# send_email(subject=template["subject"],body=template["body"],recipients="asd")
+
+if __name__=="__main__":
+    receiver_email = os.environ["TEST_RECEIVER_EMAIL"]  # Enter receiver address
+    message = """
+    This message is sent from Python.
+    """
+
+    subject= "Price Just Dropped !!!"
+
+    send_email(subject=subject,body=message,recipients=receiver_email)

@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+import re
 
 # Create your models here.
 
@@ -22,6 +23,11 @@ class Price(models.Model):
 
     def __str__(self):
         return f"{self.price}---------{self.product.title[:40]}"
+    
+    def floatPrice(self,):  
+        return float(re.sub(r'[^0-9.]', '',self.price))
+
+
 class Track(models.Model):
 
     user    = models.ForeignKey(User,on_delete=models.CASCADE)
