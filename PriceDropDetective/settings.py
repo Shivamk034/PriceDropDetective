@@ -28,7 +28,7 @@ SECRET_KEY = os.environ["SECRET_KEY"]
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = "DEV" in os.environ
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["shivam-kala-price-drop-detective.hf.space"]
 
 
 # Application definition
@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'main',
-
+    'corsheaders',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -55,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -127,7 +128,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 
@@ -164,3 +165,12 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
+
+
+CSRF_TRUSTED_ORIGINS = ['http://*','https://*','https://shivam-kala-price-drop-detective.hf.space']
+
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_WHITELIST = [
+    'https://shivam-kala-price-drop-detective.hf.space',
+    # Add other allowed origins as needed
+]

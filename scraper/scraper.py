@@ -32,7 +32,7 @@ def getDriver():
     # Set up the Chrome driver
     driver = webdriver.Chrome(options=getOptions())
     driver.set_window_size(2220,1080)
-    driver.maximize_window()
+    # driver.maximize_window()
     # close existing driver
     # if driver:  driver.close()
     return driver
