@@ -1,0 +1,5 @@
+Django==5.0.2
+python-dotenv==1.0.1
+Requests==2.31.0
+schedule==1.2.1
+selenium==4.18.1
