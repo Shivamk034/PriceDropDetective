@@ -6,3 +6,4 @@ selenium==4.18.1
 django-allauth==0.61.1
 fake_useragent
 django-cors-headers
+pillow

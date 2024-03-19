@@ -9,8 +9,7 @@ from datetime import datetime
 
 
 
-ua = UserAgent()
-
+ua = UserAgent(platforms="pc")
 
 log_dir=Path("logs/images/")
 if not os.path.exists(log_dir): os.makedirs(log_dir)
@@ -22,16 +21,16 @@ def getOptions():
     chrome_options.add_argument('--disable-dev-shm-usage')
     chrome_options.add_argument("--log-level=0")
     chrome_options.add_argument('--ignore-certificate-errors')
-    chrome_options.add_argument('--incognito')
+    # chrome_options.add_argument('--incognito')
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-    # chrome_options.add_argument("--window-size=2220,1080")
-    # chrome_options.add_argument(f"user-agent={ua.random}")
+    chrome_options.add_argument("--window-size=1920,1080")
+    chrome_options.add_argument(f"user-agent={ua.random}")
     return chrome_options
 
 def getDriver():
     # Set up the Chrome driver
     driver = webdriver.Chrome(options=getOptions())
-    driver.set_window_size(2220,1080)
+    # driver.set_window_size(2220,1080)
     # driver.maximize_window()
     # close existing driver
     # if driver:  driver.close()
@@ -46,6 +45,11 @@ class BaseScrapper(ABC):
     #     print("Destructor called !")
     #     self.driver.close()
 
+    def takeScreenshot(self):
+        cur_time = datetime.now()
+        img_path = log_dir/Path(f"{cur_time.day}-{cur_time.month}-{cur_time.year}--{cur_time.hour}-{cur_time.minute}-{cur_time.microsecond}.png")
+        self.driver.save_screenshot(img_path)
+
     @classmethod
     def getBaseUrl(cls,url):
         return "/".join(url.split("/",3)[:3])+"/"
@@ -57,9 +61,7 @@ class BaseScrapper(ABC):
     def updateUrl(self,url):
         self.url=url
         self.driver.get(url)
-        cur_time = datetime.now()
-        img_path = log_dir/Path(f"{cur_time.day}-{cur_time.month}-{cur_time.year}--{cur_time.hour}-{cur_time.minute}-{cur_time.microsecond}.png")
-        self.driver.save_screenshot(img_path)
+        
 
     def getHTML(self):
         return self.driver.page_source.encode("UTF-8")
@@ -82,7 +84,9 @@ class BaseScrapper(ABC):
 
 def error_handler(f):
     def exec(*args,**kwargs):
+        # self=args[0]
         try:
+            # print(self)
             return f(*args,**kwargs)
         except Exception as e:
             print(e)
@@ -127,11 +131,14 @@ class AmazonScrapper(BaseScrapper):
         return self.driver.find_element(By.XPATH, '//*[@id="landingImage"]').get_attribute('src')
         
     def getData(self):
-        return {
+        data = {
             "title":self.getTitle(),
             "price":self.getPrice(),
             "image":self.getImage(),
         }
+
+        if data["price"]==None or data["title"]==None or data["image"]==None :   self.takeScreenshot()
+        return data
 
 class FlipkartScrapper(BaseScrapper):
     def __init__(self,driver,url):
@@ -158,11 +165,14 @@ class FlipkartScrapper(BaseScrapper):
 
         
     def getData(self):
-        return {
+        data = {
             "title":self.getTitle(),
             "price":self.getPrice(),
             "image":self.getImage(),
         }
+
+        if data["price"]==None or data["title"]==None or data["image"]==None :   self.takeScreenshot()
+        return data
 
 if __name__ == "__main__":
     # https://www.amazon.in/dp/B07WHQRN1B/
@@ -172,9 +182,12 @@ if __name__ == "__main__":
 
     
     url = "https://www.amazon.com/dp/B088SKYMF2/"
+    # url = "https://www.amazon.com/dp/B08F2/"
+    # url = "https://wasdasdzx2/"
     scrapper = AmazonScrapper(driver,AmazonScrapper.getShortUrl(url))
     print(scrapper.url)
-    print(scrapper.getData())
+    data=scrapper.getData()
+    print(data)
     
     driver.close()
     exit()

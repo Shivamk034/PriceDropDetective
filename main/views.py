@@ -5,6 +5,11 @@ from django.urls import reverse
 from scraper.scraper import *
 from .models import Product,Price,Track
 import json
+import os
+from glob import glob
+from PIL import Image
+from pathlib import Path
+
 # from . import scheduled_jobs
 
 def getScrapper(url):
@@ -34,10 +39,15 @@ def add_product(request):
         scrapperClass = getScrapper(request.POST["url"])
         
         if(scrapperClass==None):
+            # EXPERIMENT !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            driver = getDriver()
+            scrapper = AmazonScrapper(driver,request.POST["url"])
+            scrapper.getData()
             return render(request,"main/main_screen.html",context={"error":"unsupported url"})
         
         try:
-            url = scrapperClass.getShortUrl(request.POST["url"])
+            # url = scrapperClass.getShortUrl(request.POST["url"])
+            url = (request.POST["url"])
             print("url:",url)
         except:
             # if we were unable to get the short url
@@ -48,10 +58,13 @@ def add_product(request):
         if(len(track)>0):
             return render(request,"main/main_screen.html",context={"error":"already tracking this url"})
         
-        driver = getDriver() 
+        driver = getDriver()
+
+        # handling when driver is unable to get the page (the url might be wrong)
         try:
             scrapper = scrapperClass(driver,url)
-        except:
+        except Exception as e:
+            print(e)
             return render(request,"main/main_screen.html",context={"error":"invalid url"})
         
         # check if product is already tracked by someone
@@ -119,3 +132,25 @@ def delete_product(request,id):
         track.delete() 
 
         return HttpResponse(status=204)
+
+@login_required(login_url="/")
+def get_image(request,path):
+    if(not request.user.is_superuser):
+       HttpResponse(status=401)
+    
+    base_image = Image.open("logs/images/"+path)
+    
+    response = HttpResponse(content_type="image/png")
+    base_image.save(response,"PNG")
+    return response
+
+@login_required(login_url="/")
+def logs_view(request):
+    if(not request.user.is_superuser):
+       HttpResponse(status=401)
+    
+    # get all the logs screenshots in latest to oldest order
+    # print(Path("logs/images/*.png"))
+    image_list = os.listdir("logs/images/")
+    image_list.sort(reverse=True)
+    return render(request,"main/logs.html",context={"image_list":image_list})

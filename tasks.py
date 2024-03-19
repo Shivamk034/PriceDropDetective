@@ -11,9 +11,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-driver = getDriver()
 
-def getScrapper(url):
+def getScrapper(driver,url):
     if("amazon" in url.lower()):
         return AmazonScrapper(driver,url)
     elif("flipkart" in url.lower()):
@@ -24,12 +23,14 @@ def getScrapper(url):
 
 def my_scheduled_job():
   
+  driver = getDriver()
+
   print("Started Scrapping")
   products = Product.objects.all()
   for i,product in enumerate(products):
     print(f"Scrapping {i+1}th url out of {len(products)} urls!")
     try:
-      scrapper = getScrapper(product.url)
+      scrapper = getScrapper(driver,product.url)
       product_price=scrapper.getPrice()
       if(product_price!=None):
         last_price = product.price_set.last()   # last scrapped price for this product
@@ -52,6 +53,7 @@ def my_scheduled_job():
             send_email(subject=template["subject"],body=template["body"],recipients=user.email)
 
       else:
+        scrapper.takeScreenshot()
         print("couldn't scrap price of product id:",product.id)
          
     except Exception as e:
