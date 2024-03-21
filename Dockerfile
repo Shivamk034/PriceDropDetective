@@ -12,7 +12,13 @@ RUN apk update && apk add chromium-chromedriver chromium
 ENV PATH="/usr/lib/chromium/:${PATH}"
 RUN ln -s /usr/lib/chromium/chromium-launcher.sh /usr/local/bin/chrome
 
+# virtual display
+RUN apk add xvfb
 
+# RUN apk add imagemagick
+# RUN mkdir /app/logs/ && mkdir /app/logs/images/
+# RUN import -display :99 -window root /app/logs/images/screenshot.png
+# RUN xwd -display :99 -root -silent | convert xwd:- png:/app/logs/images/screenshot.png
 
 COPY . /app
 WORKDIR /app
@@ -35,4 +41,8 @@ CMD /app/startup.sh
 
 # https://huggingface.co/spaces/shivam-kala/Price-Drop-Detective
 # https://shivam-kala-price-drop-detective.hf.space/
-
+# apk add imagemagick
+# import -display :99 -window root screenshot.png
+# -display :99: Specifies the display to capture the screenshot from. In this case, it's using display :99.
+# -window root: Specifies to capture the entire screen.
+# screenshot.png: Specifies the filename to save the screenshot to. You can change it as needed.
