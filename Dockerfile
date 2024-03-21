@@ -13,8 +13,9 @@ ENV PATH="/usr/lib/chromium/:${PATH}"
 RUN ln -s /usr/lib/chromium/chromium-launcher.sh /usr/local/bin/chrome
 
 # virtual display
-# RUN apk add xvfb
+RUN apk add xvfb
 
+# screenshot
 # RUN apk add imagemagick
 # RUN mkdir /app/logs/ && mkdir /app/logs/images/
 # RUN import -display :99 -window root /app/logs/images/screenshot.png
