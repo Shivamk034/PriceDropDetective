@@ -13,7 +13,7 @@ ENV PATH="/usr/lib/chromium/:${PATH}"
 RUN ln -s /usr/lib/chromium/chromium-launcher.sh /usr/local/bin/chrome
 
 # virtual display
-# RUN apk add xvfb
+RUN apk add xvfb xorg-server dbus ttf-freefont
 
 # screenshot
 # RUN apk add imagemagick
@@ -38,7 +38,7 @@ RUN chmod 777 startup.sh
 EXPOSE 8000
 
 
-CMD /app/startup.sh
+CMD exec /app/startup.sh
 
 # https://huggingface.co/spaces/shivam-kala/Price-Drop-Detective
 # https://shivam-kala-price-drop-detective.hf.space/
@@ -47,3 +47,5 @@ CMD /app/startup.sh
 # -display :99: Specifies the display to capture the screenshot from. In this case, it's using display :99.
 # -window root: Specifies to capture the entire screen.
 # screenshot.png: Specifies the filename to save the screenshot to. You can change it as needed.
+
+# RUN echo "Errors from xkbcomp are not fatal to the X server" >/dev/null 2>&1

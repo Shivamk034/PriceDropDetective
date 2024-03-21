@@ -16,7 +16,7 @@ if not os.path.exists(log_dir): os.makedirs(log_dir)
 
 def getOptions():
     chrome_options = webdriver.ChromeOptions() # Create object ChromeOptions()
-    chrome_options.add_argument('--headless=new')           
+    # chrome_options.add_argument('--headless=new')           
     chrome_options.add_argument('--no-sandbox')                             
     chrome_options.add_argument('--disable-dev-shm-usage')
     chrome_options.add_argument("--log-level=0")
