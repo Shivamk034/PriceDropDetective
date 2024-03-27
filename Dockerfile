@@ -13,7 +13,7 @@ ENV PATH="/usr/lib/chromium/:${PATH}"
 RUN ln -s /usr/lib/chromium/chromium-launcher.sh /usr/local/bin/chrome
 
 # virtual display
-RUN apk add xvfb xorg-server dbus ttf-freefont
+# RUN apk add xvfb xorg-server dbus ttf-freefont
 
 # screenshot
 # RUN apk add imagemagick
@@ -49,3 +49,14 @@ CMD exec /app/startup.sh
 # screenshot.png: Specifies the filename to save the screenshot to. You can change it as needed.
 
 # RUN echo "Errors from xkbcomp are not fatal to the X server" >/dev/null 2>&1
+
+
+# 1 XSELINUXs still allocated at reset
+# SCREEN: 0 objects of 304 bytes = 0 total bytes 0 private allocs
+# DEVICE: 0 objects of 88 bytes = 0 total bytes 0 private allocs
+# CLIENT: 0 objects of 144 bytes = 0 total bytes 0 private allocs
+# WINDOW: 0 objects of 48 bytes = 0 total bytes 0 private allocs
+# PIXMAP: 0 objects of 16 bytes = 0 total bytes 0 private allocs
+# GC: 0 objects of 16 bytes = 0 total bytes 0 private allocs
+# CURSOR: 1 objects of 8 bytes = 8 total bytes 0 private allocs
+# TOTAL: 1 objects, 8 bytes, 0 allocs
