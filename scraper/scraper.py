@@ -16,7 +16,8 @@ if not os.path.exists(log_dir): os.makedirs(log_dir)
 
 def getOptions():
     chrome_options = webdriver.ChromeOptions() # Create object ChromeOptions()
-    chrome_options.add_argument('--headless=new')           
+    chrome_options.add_argument('--headless')           
+    # chrome_options.add_argument('--headless=new')           
     chrome_options.add_argument('--no-sandbox')                             
     chrome_options.add_argument('--disable-dev-shm-usage')
     chrome_options.add_argument("--log-level=0")
@@ -24,7 +25,7 @@ def getOptions():
     chrome_options.add_argument('--incognito')
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
     chrome_options.add_argument("--window-size=1920,1080")
-    # chrome_options.add_argument(f"user-agent={ua.random}")
+    chrome_options.add_argument(f"user-agent={ua.random}")
     return chrome_options
 
 def getDriver():
