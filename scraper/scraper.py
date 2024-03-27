@@ -21,7 +21,7 @@ def getOptions():
     chrome_options.add_argument('--disable-dev-shm-usage')
     chrome_options.add_argument("--log-level=0")
     chrome_options.add_argument('--ignore-certificate-errors')
-    # chrome_options.add_argument('--incognito')
+    chrome_options.add_argument('--incognito')
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
     chrome_options.add_argument("--window-size=1920,1080")
     # chrome_options.add_argument(f"user-agent={ua.random}")
@@ -46,7 +46,7 @@ class BaseScrapper(ABC):
 
     def takeScreenshot(self):
         cur_time = datetime.now()
-        img_path = log_dir/Path(f"{cur_time.day}-{cur_time.month}-{cur_time.year}--{cur_time.hour}-{cur_time.minute}-{cur_time.microsecond}.png")
+        img_path = log_dir/Path(f"{cur_time.day}-{cur_time.month}-{cur_time.year}--{cur_time.hour}-{cur_time.minute}-{cur_time.second}-{cur_time.microsecond}.png")
         self.driver.save_screenshot(img_path)
 
     @classmethod
@@ -183,10 +183,12 @@ if __name__ == "__main__":
     url = "https://www.amazon.com/dp/B088SKYMF2/"
     # url = "https://www.amazon.com/dp/B08F2/"
     # url = "https://wasdasdzx2/"
-    scrapper = AmazonScrapper(driver,AmazonScrapper.getShortUrl(url))
-    print(scrapper.url)
-    data=scrapper.getData()
-    print(data)
+
+    for _ in range(40):
+        scrapper = AmazonScrapper(driver,AmazonScrapper.getShortUrl(url))
+        print(scrapper.url)
+        data=scrapper.getData()
+        print(data)
     
     driver.close()
     exit()
