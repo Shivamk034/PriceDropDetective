@@ -40,14 +40,14 @@ def add_product(request):
         
         if(scrapperClass==None):
             # EXPERIMENT !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            driver = getDriver()
-            scrapper = AmazonScrapper(driver,request.POST["url"])
-            scrapper.getData()
+            # driver = getDriver()
+            # scrapper = AmazonScrapper(driver,request.POST["url"])
+            # scrapper.getData()
             return render(request,"main/main_screen.html",context={"error":"unsupported url"})
         
         try:
-            # url = scrapperClass.getShortUrl(request.POST["url"])
-            url = (request.POST["url"])
+            # url = (request.POST["url"])
+            url = scrapperClass.getShortUrl(request.POST["url"])
             print("url:",url)
         except:
             # if we were unable to get the short url

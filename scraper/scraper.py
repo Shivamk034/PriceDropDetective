@@ -24,7 +24,7 @@ def getOptions():
     # chrome_options.add_argument('--incognito')
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
     chrome_options.add_argument("--window-size=1920,1080")
-    chrome_options.add_argument(f"user-agent={ua.random}")
+    # chrome_options.add_argument(f"user-agent={ua.random}")
     return chrome_options
 
 def getDriver():
