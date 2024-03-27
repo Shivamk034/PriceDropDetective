@@ -5,7 +5,7 @@ from fake_useragent import UserAgent
 from pathlib import Path
 import os
 from datetime import datetime
-
+import requests, tempfile, shutil 
 
 
 
@@ -16,16 +16,21 @@ if not os.path.exists(log_dir): os.makedirs(log_dir)
 
 def getOptions():
     chrome_options = webdriver.ChromeOptions() # Create object ChromeOptions()
-    chrome_options.add_argument('--headless')           
-    # chrome_options.add_argument('--headless=new')           
+    # chrome_options.add_argument('--headless')           
+    chrome_options.add_argument('--headless=new')           
     chrome_options.add_argument('--no-sandbox')                             
     chrome_options.add_argument('--disable-dev-shm-usage')
     chrome_options.add_argument("--log-level=0")
     chrome_options.add_argument('--ignore-certificate-errors')
     chrome_options.add_argument('--incognito')
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+    chrome_options.add_argument("--disable-javascript")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--disable-blink-settings=imagesEnabled=false")
     chrome_options.add_argument("--window-size=1920,1080")
     chrome_options.add_argument(f"user-agent={ua.random}")
+    prefs = {"profile.managed_default_content_settings.images": 2}
+    chrome_options.add_experimental_option("prefs", prefs)
     return chrome_options
 
 def getDriver():
@@ -36,8 +41,24 @@ def getDriver():
     # if driver:  driver.close()
     return driver
 
+def getHTMLFROMAPI(url):
+    headers = {
+        "Accept-language": "en-GB,en;q=0.9",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Cache-Control": "max-age=0",
+        "Connection": "keep-alive",
+        "User-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Safari/605.1.15",
+    }
+    data = {
+        "url":url,
+        "headers":headers,
+    }
+
+    res = requests.post("https://anuj-panthri-puppeteer-api.hf.space/html",data=data,headers={"Connection": "keep-alive"}).json()
+    return (res["html"]).encode("UTF-8")
+
 class BaseScrapper(ABC):
-    def __init__(self,driver,url):
+    def __init__(self,driver:webdriver.Chrome,url):
         self.driver = driver
         self.updateUrl(url)
 
@@ -60,7 +81,22 @@ class BaseScrapper(ABC):
     
     def updateUrl(self,url):
         self.url=url
-        self.driver.get(url)
+        
+        # gethtml from api and make a temp html file out of it
+        html = getHTMLFROMAPI(url)
+        temp_dir = Path("temp/")
+        if not os.path.exists(temp_dir): os.makedirs(temp_dir)
+
+        html_path = temp_dir/Path("index.html")
+        open(html_path,'wb').write(html)
+        html_path = str(html_path.absolute()).replace("\\","/")
+        print(html_path)
+        
+        self.driver.get("file:///"+html_path)
+        # file:///D:/projects/html%20&%20JS%20projects/PriceDropDetective/temp/index.html
+        # self.driver
+        # delete temp dir
+        shutil.rmtree(temp_dir)
         
 
     def getHTML(self):
@@ -185,12 +221,13 @@ if __name__ == "__main__":
     # url = "https://www.amazon.com/dp/B08F2/"
     # url = "https://wasdasdzx2/"
 
-    for _ in range(40):
-        scrapper = AmazonScrapper(driver,AmazonScrapper.getShortUrl(url))
-        print(scrapper.url)
-        data=scrapper.getData()
-        print(data)
     
+    # print(getHTMLFROMAPI(url))
+    scrapper = AmazonScrapper(driver,AmazonScrapper.getShortUrl(url))
+    print(scrapper.url)
+    data=scrapper.getData()
+    print(data)
+    # input("stop")
     driver.close()
     exit()
 
