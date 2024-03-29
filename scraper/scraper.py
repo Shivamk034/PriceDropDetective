@@ -5,7 +5,7 @@ from fake_useragent import UserAgent
 from pathlib import Path
 import os
 from datetime import datetime
-import requests, tempfile, shutil 
+import requests, tempfile, shutil ,uuid
 
 
 
@@ -47,7 +47,8 @@ def getHTMLFROMAPI(url):
         "Accept-Encoding": "gzip, deflate, br",
         "Cache-Control": "max-age=0",
         "Connection": "keep-alive",
-        "User-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Safari/605.1.15",
+        # "User-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Safari/605.1.15",
+        "User-agent": ua.random
     }
     data = {
         "url":url,
@@ -68,7 +69,7 @@ class BaseScrapper(ABC):
 
     def takeScreenshot(self):
         cur_time = datetime.now()
-        img_path = log_dir/Path(f"{cur_time.day}-{cur_time.month}-{cur_time.year}--{cur_time.hour}-{cur_time.minute}-{cur_time.second}-{cur_time.microsecond}.png")
+        img_path = log_dir/Path(f"{cur_time.day}-{cur_time.month}-{cur_time.year}--{cur_time.hour}-{cur_time.minute}-{cur_time.second}.png")
         self.driver.save_screenshot(img_path)
 
     @classmethod
@@ -87,7 +88,7 @@ class BaseScrapper(ABC):
         temp_dir = Path("temp/")
         if not os.path.exists(temp_dir): os.makedirs(temp_dir)
 
-        html_path = temp_dir/Path("index.html")
+        html_path = temp_dir/Path(f"{str(uuid.uuid1())}.html")
         open(html_path,'wb').write(html)
         html_path = str(html_path.absolute()).replace("\\","/")
         print(html_path)
