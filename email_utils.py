@@ -39,23 +39,23 @@ def get_template_price_drop_email(name,product_name,product_url,previous_price,n
 
     prod_name_len = 20
     subject = f""" Price Drop Alert!  | {product_name[:prod_name_len]+("..." if len(product_name)>prod_name_len else "")}"""
-    body = f""" 
-    Hello, {name}
-    
-    We are excited to inform you that the price of the product you have been monitoring has dropped!
+    body = f"""
+Hello, {name}
 
-    Product Name: {product_name}
-    Previous Price: {previous_price}
-    New Price: {new_price}
-    Buy Product: {product_url}
-    Product Detail: {product_detail_url}
+We are excited to inform you that the price of the product you have been monitoring has dropped!
 
-    Hurry up and grab this opportunity before the price changes again!
+Product Name: {product_name}
+Previous Price: {previous_price}
+New Price: {new_price}
+Buy Product: {product_url}
+Product Detail: https://shivam-kala-price-drop-detective.hf.space{product_detail_url}
 
-    Thank you for using Price Drop Detective!
+Hurry up and grab this opportunity before the price changes again!
 
-    Best regards,
-    Your Price Drop Detective Team
+Thank you for using Price Drop Detective!
+
+Best regards,
+Your Price Drop Detective Team
  """
 
     return {
@@ -68,6 +68,7 @@ def get_template_price_drop_email(name,product_name,product_url,previous_price,n
 
 if __name__=="__main__":
     receiver_email = os.environ["TEST_RECEIVER_EMAIL"]  # Enter receiver address
+    # receiver_email = os.environ["ADMIN_EMAIL"]  # Enter receiver address
     message = """
     This message is sent from Python.
     """

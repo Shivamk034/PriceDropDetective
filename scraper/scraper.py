@@ -5,7 +5,7 @@ from fake_useragent import UserAgent
 from pathlib import Path
 import os
 from datetime import datetime
-import requests, tempfile, shutil ,uuid
+import requests, shutil ,uuid, random
 
 
 
@@ -41,7 +41,19 @@ def getDriver():
     # if driver:  driver.close()
     return driver
 
+
+apis = [
+  # "https://anuj-panthri-puppeteer-api.hf.space/html/",
+  "https://anuj-panthri-puppeteer-api-1.hf.space/html/",
+  "https://anuj-panthri-puppeteer-api-2.hf.space/html/",
+  "https://shivam-kala-puppeteer-api-3.hf.space/html/",
+  "https://shivam-kala-puppeteer-api-4.hf.space/html/",
+  ]
+
 def getHTMLFROMAPI(url):
+    
+    api = apis[random.randint(0,len(apis)-1)]
+
     headers = {
         "Accept-language": "en-GB,en;q=0.9",
         "Accept-Encoding": "gzip, deflate, br",
@@ -54,8 +66,8 @@ def getHTMLFROMAPI(url):
         "url":url,
         "headers":headers,
     }
-
-    res = requests.post("https://anuj-panthri-puppeteer-api.hf.space/html",data=data,headers={"Connection": "keep-alive"}).json()
+    print("using_api:",api)
+    res = requests.post(api,data=data).json()
     return (res["html"]).encode("UTF-8")
 
 class BaseScrapper(ABC):
@@ -224,36 +236,36 @@ if __name__ == "__main__":
 
     
     # print(getHTMLFROMAPI(url))
-    scrapper = AmazonScrapper(driver,AmazonScrapper.getShortUrl(url))
-    print(scrapper.url)
-    data=scrapper.getData()
-    print(data)
-    # input("stop")
-    driver.close()
-    exit()
+    # scrapper = AmazonScrapper(driver,AmazonScrapper.getShortUrl(url))
+    # print(scrapper.url)
+    # data=scrapper.getData()
+    # print(data)
+    # # input("stop")
+    # driver.close()
+    # exit()
 
-    url = "https://www.amazon.com/dp/B07PVCK9KX/"
-    scrapper.updateUrl(AmazonScrapper.getShortUrl(url))
-    print(scrapper.url)
-    print(scrapper.getData())
-    
-    url = "https://www.amazon.com/dp/B07CNPBS7T/"
-    scrapper.updateUrl(AmazonScrapper.getShortUrl(url))
-    print(scrapper.url)
-    print(scrapper.getData())
-
-    # url = "https://www.amazon.com/Hope-Rainbow-Hoda-Kotb/dp/0593624122/?_encoding=UTF8&_encoding=UTF8&ref_=dlx_gate_sd_dcl_tlt_fa13649f_dt_pd_gw_unk&pd_rd_w=FPLOl&content-id=amzn1.sym.81a68cec-8afc-4296-99f7-78cf5ddc15b5&pf_rd_p=81a68cec-8afc-4296-99f7-78cf5ddc15b5&pf_rd_r=KAD1QPN234SH5MXYBNW6&pd_rd_wg=A7ZKi&pd_rd_r=fa39bbc3-93b1-41a2-b592-77d89dfc6566"
-    # url = "https://www.amazon.in/Lux-Cozi-Melange-Regular-Sleeves/dp/B0CH9QMFF4/ref=sl_ob_desktop_dp_0_2_v2?_encoding=UTF8&pd_rd_w=1Bm0J&content-id=amzn1.sym.cdbcd11c-3329-43cb-9547-fb297b2c655b&pf_rd_p=cdbcd11c-3329-43cb-9547-fb297b2c655b&pf_rd_r=PTKWAM93FTVZKNGQFPVM&pd_rd_wg=iE7ky&pd_rd_r=ccfc3bd0-e267-435c-85d3-f63c78a1db0a"
-    url = "https://www.amazon.in/dp/B0CHM745CT/ref=syn_sd_onsite_desktop_0?ie=UTF8&pd_rd_plhdr=t&aref=94rDEQyVIg&th=1"
-    scrapper.updateUrl(AmazonScrapper.getShortUrl(url))
-    print(scrapper.url)
-    print(scrapper.getData())
-
-    # url = 'https://www.flipkart.com/apple-iphone-15-blue-128-gb/p/itmbf14ef54f645d?pid=MOBGTAGPAQNVFZZY&lid=LSTMOBGTAGPAQNVFZZYO7HQ2L&marketplace=FLIPKART&store=tyy%2F4io&spotlightTagId=BestsellerId_tyy%2F4io&srno=b_1_1&otracker=browse&fm=organic&iid=fedd7fea-5ff7-4bd7-a5f0-a9008f1702c3.MOBGTAGPAQNVFZZY.SEARCH&ppt=browse&ppn=browse&ssid=7un6hxsq6o0000001710258321538'
-    # scrapper = FlipkartScrapper(driver,FlipkartScrapper.getShortUrl(url))
-    # open("index.html","wb").write(scrapper.getHTML())
+    # url = "https://www.amazon.com/dp/B07PVCK9KX/"
+    # scrapper.updateUrl(AmazonScrapper.getShortUrl(url))
     # print(scrapper.url)
     # print(scrapper.getData())
+    
+    # url = "https://www.amazon.com/dp/B07CNPBS7T/"
+    # scrapper.updateUrl(AmazonScrapper.getShortUrl(url))
+    # print(scrapper.url)
+    # print(scrapper.getData())
+
+    # # url = "https://www.amazon.com/Hope-Rainbow-Hoda-Kotb/dp/0593624122/?_encoding=UTF8&_encoding=UTF8&ref_=dlx_gate_sd_dcl_tlt_fa13649f_dt_pd_gw_unk&pd_rd_w=FPLOl&content-id=amzn1.sym.81a68cec-8afc-4296-99f7-78cf5ddc15b5&pf_rd_p=81a68cec-8afc-4296-99f7-78cf5ddc15b5&pf_rd_r=KAD1QPN234SH5MXYBNW6&pd_rd_wg=A7ZKi&pd_rd_r=fa39bbc3-93b1-41a2-b592-77d89dfc6566"
+    # # url = "https://www.amazon.in/Lux-Cozi-Melange-Regular-Sleeves/dp/B0CH9QMFF4/ref=sl_ob_desktop_dp_0_2_v2?_encoding=UTF8&pd_rd_w=1Bm0J&content-id=amzn1.sym.cdbcd11c-3329-43cb-9547-fb297b2c655b&pf_rd_p=cdbcd11c-3329-43cb-9547-fb297b2c655b&pf_rd_r=PTKWAM93FTVZKNGQFPVM&pd_rd_wg=iE7ky&pd_rd_r=ccfc3bd0-e267-435c-85d3-f63c78a1db0a"
+    # url = "https://www.amazon.in/dp/B0CHM745CT/ref=syn_sd_onsite_desktop_0?ie=UTF8&pd_rd_plhdr=t&aref=94rDEQyVIg&th=1"
+    # scrapper.updateUrl(AmazonScrapper.getShortUrl(url))
+    # print(scrapper.url)
+    # print(scrapper.getData())
+
+    url = 'https://www.flipkart.com/apple-iphone-15-blue-128-gb/p/itmbf14ef54f645d?pid=MOBGTAGPAQNVFZZY&lid=LSTMOBGTAGPAQNVFZZYO7HQ2L&marketplace=FLIPKART&store=tyy%2F4io&spotlightTagId=BestsellerId_tyy%2F4io&srno=b_1_1&otracker=browse&fm=organic&iid=fedd7fea-5ff7-4bd7-a5f0-a9008f1702c3.MOBGTAGPAQNVFZZY.SEARCH&ppt=browse&ppn=browse&ssid=7un6hxsq6o0000001710258321538'
+    scrapper = FlipkartScrapper(driver,FlipkartScrapper.getShortUrl(url))
+    open("index.html","wb").write(scrapper.getHTML())
+    print(scrapper.url)
+    print(scrapper.getData())
 
     # url = "https://www.flipkart.com/sti-printed-men-round-neck-white-black-t-shirt/p/itm3b20cdb30cb02"
     # scrapper.updateUrl(FlipkartScrapper.getShortUrl(url))

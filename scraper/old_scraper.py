@@ -30,8 +30,16 @@ data = {
 
 app = Flask(__name__)
 
-def getData(url,headers={}):
-  html = requests.post("https://anuj-panthri-puppeteer-api.hf.space/html/",data={"url":url,"headers":headers}).json()["html"]
+apis = [
+  # "https://anuj-panthri-puppeteer-api.hf.space/html/",
+  "https://anuj-panthri-puppeteer-api-1.hf.space/html/",
+  "https://anuj-panthri-puppeteer-api-2.hf.space/html/",
+  "https://shivam-kala-puppeteer-api-3.hf.space/html/",
+  "https://shivam-kala-puppeteer-api-4.hf.space/html/",
+  ]
+
+def getData(api,url,headers={}):
+  html = requests.post(api,data={"url":url,"headers":headers}).json()["html"]
   return html
 
 
@@ -50,4 +58,9 @@ def home():
 # img = soup.find_all("img")
 # print(html)
 
-app.run(debug=True)
+# app.run(debug=True)
+
+for api in apis:
+  html=getData(api,"https://api.ipify.org/?format=json")
+  soup = BeautifulSoup(html, 'html.parser')
+  print(api,":\t",soup.find("pre").text)

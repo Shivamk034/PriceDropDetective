@@ -1,6 +1,0 @@
-
-
-# !pip install selenium                                 # Install selenium
-# !apt-get update                                       # To update ubuntu to correctly run apt install
-# !apt install chromium-chromedriver -y                 # Install chrome driver
-# !cp /usr/lib/chromium-browser/chromedriver /usr/bin   # Adding the driver path 
