@@ -2,7 +2,7 @@ import os, django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "PriceDropDetective.settings")
 django.setup()
 
-import schedule,time
+import schedule,time,random
 from scraper.scraper import *
 from main.models import Product,Price,Track
 from email_utils import send_email,get_template_price_drop_email
@@ -20,14 +20,16 @@ def getScrapper(driver,url):
     else:
         return None
 
+# 6(6+3),12(12+3),18(18+3),21(21+3) 
+# 9,15,21,24 
 
 def my_scheduled_job():
-  
+  time.sleep(random.randint(15*60,3*60*60))  # random interval scrape intervals
   driver = getDriver()
-
   print("Started Scrapping")
   products = Product.objects.all()
   for i,product in enumerate(products):
+    time.sleep(random.randint(5,10))  # random interval between requests
     print(f"Scrapping {i+1}th url out of {len(products)} urls!")
     try:
       scrapper = getScrapper(driver,product.url)
