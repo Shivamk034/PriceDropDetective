@@ -172,5 +172,6 @@ CSRF_TRUSTED_ORIGINS = ['http://*','https://*','https://shivam-kala-price-drop-d
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ORIGIN_WHITELIST = [
     'https://shivam-kala-price-drop-detective.hf.space',
+    'https://anuj-panthri-price-drop-detective.hf.space'
     # Add other allowed origins as needed
 ]
