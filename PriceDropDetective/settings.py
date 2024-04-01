@@ -167,7 +167,7 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 
-CSRF_TRUSTED_ORIGINS = ['http://*','https://*','https://shivam-kala-price-drop-detective.hf.space']
+CSRF_TRUSTED_ORIGINS = ['http://*','https://*','https://shivam-kala-price-drop-detective.hf.space', 'https://anuj-panthri-price-drop-detective.hf.space']
 
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ORIGIN_WHITELIST = [
