@@ -7,4 +7,5 @@ django-allauth==0.61.1
 fake_useragent
 django-cors-headers
 pillow
-psycopg2
+# psycopg2
+psycopg2-binary
