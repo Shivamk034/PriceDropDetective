@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'main',
     'corsheaders',
+    # 'django.contrib.sites'
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -110,7 +111,7 @@ DATABASES = {
         'USER': os.environ["PGUSER"],
         'PASSWORD': os.environ["PGPASSWORD"],
         'HOST': os.environ["PGHOST"],
-        'PORT': os.environ["PGPORT"],
+        # 'PORT': os.environ["PGPORT"],
     }
 }
 
