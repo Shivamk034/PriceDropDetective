@@ -22,6 +22,8 @@ RUN pip3 install -r requirements.txt --no-cache-dir
 
 RUN chmod 777 /app;
 RUN chmod 777 startup.sh
+RUN mkdir -p /.cache/selenium
+RUN chmod 777 /.cache/selenium
 
 EXPOSE 8000
 
