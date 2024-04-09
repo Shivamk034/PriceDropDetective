@@ -16,8 +16,8 @@ if not os.path.exists(log_dir): os.makedirs(log_dir)
 
 def getOptions():
     chrome_options = webdriver.ChromeOptions() # Create object ChromeOptions()
-    # chrome_options.add_argument('--headless')           
-    chrome_options.add_argument('--headless=new')           
+    chrome_options.add_argument('--headless')           
+    # chrome_options.add_argument('--headless=new')           
     chrome_options.add_argument('--no-sandbox')                             
     chrome_options.add_argument('--disable-dev-shm-usage')
     chrome_options.add_argument("--log-level=0")
@@ -36,6 +36,7 @@ def getOptions():
 def getDriver():
     # Set up the Chrome driver
     driver = webdriver.Chrome(options=getOptions())
+    # webdriver.
     # driver.set_window_size(2220,1080)
     # driver.maximize_window()
     # if driver:  driver.close()
