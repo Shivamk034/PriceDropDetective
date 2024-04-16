@@ -193,18 +193,18 @@ if __name__ == "__main__":
 
     
     # url = "https://www.amazon.com/dp/B088SKYMF2/"
-    url = "https://www.amazon.com/dp/B0CYCKS9S4?th=1"
+    # url = "https://www.amazon.com/dp/B0CYCKS9S4?th=1"
     # url = "https://www.amazon.com/dp/B08F2/"
     # url = "https://wasdasdzx2/"
 
     
     # print(getHTMLFROMAPI(url))
-    scrapper = AmazonScrapper(AmazonScrapper.getShortUrl(url))
-    print(scrapper.url)
-    data=scrapper.getData()
-    scrapper.takeScreenshot()
-    open("index.html","wb").write(scrapper.getHTML())
-    print(data)
+    # scrapper = AmazonScrapper(AmazonScrapper.getShortUrl(url))
+    # print(scrapper.url)
+    # data=scrapper.getData()
+    # scrapper.takeScreenshot()
+    # open("index.html","wb").write(scrapper.getHTML())
+    # print(data)
     # # input("stop")
     # exit()
 
@@ -224,7 +224,7 @@ if __name__ == "__main__":
     # scrapper.updateUrl(AmazonScrapper.getShortUrl(url))
     # print(scrapper.url)
     # print(scrapper.getData())
-
+    url = "https://www.flipkart.com/play-mp1-a-smart-wifi-3d-4k-full-hd-led-recently-launched-android-8-0-projector-genuine-multifunction-home-office-entertainment-bluetooth-4d-keystone-300-inch-display-1920x1080p-portable-mini-digital-projector-vga-usb-hdmi-home-theater-5500-lm-wireless-remote-controller-projector/p/itm074a5ffecaaeb?pid=PROG8669KWF79N4M&lid=LSTPROG8669KWF79N4M5BASUJ&marketplace=FLIPKART&store=6bo%2Ftia%2F1hx&srno=b_1_1&otracker=browse&otracker1=hp_rich_navigation_PINNED_neo%2Fmerchandising_NA_NAV_EXPANDABLE_navigationCard_cc_4_L2_view-all&fm=organic&iid=en_LBb1tb_UvM8GDd2JetuL0M6u7M3PThc2nRcqXv_7SjYSgFAwhjvAn5iFH5HT8M7N9ND-3dLak-GrZ3KhUbsG3g%3D%3D&ppt=browse&ppn=browse&ssid=ve9vmvg0dc0000001713290617288"
     url = 'https://www.flipkart.com/apple-iphone-15-blue-128-gb/p/itmbf14ef54f645d?pid=MOBGTAGPAQNVFZZY&lid=LSTMOBGTAGPAQNVFZZYO7HQ2L&marketplace=FLIPKART&store=tyy%2F4io&spotlightTagId=BestsellerId_tyy%2F4io&srno=b_1_1&otracker=browse&fm=organic&iid=fedd7fea-5ff7-4bd7-a5f0-a9008f1702c3.MOBGTAGPAQNVFZZY.SEARCH&ppt=browse&ppn=browse&ssid=7un6hxsq6o0000001710258321538'
     scrapper = FlipkartScrapper(FlipkartScrapper.getShortUrl(url))
     # open("index.html","wb").write(scrapper.getHTML())
