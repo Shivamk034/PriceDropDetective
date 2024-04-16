@@ -6,7 +6,6 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 import base64, io, numpy as np
 from PIL import Image
-import cv2
 
 ua = UserAgent(platforms="pc")
 
@@ -53,7 +52,8 @@ class BaseScrapper(ABC):
         img_path = log_dir/Path(f"{cur_time.day}-{cur_time.month}-{cur_time.year}--{cur_time.hour}-{cur_time.minute}-{cur_time.second}.png")
         bytes_array = io.BytesIO(base64.b64decode(self.base64))
         image = np.array(Image.open(bytes_array).convert("RGB"))
-        cv2.imwrite(str(img_path),image[:,:,::-1])
+        Image.fromarray(image).save(img_path)
+        
         
 
     @classmethod
