@@ -5,7 +5,11 @@ django.setup()
 import os
 from django.contrib.auth.models import User
 
-user = User(username=os.environ["ADMIN_USERNAME"],
+try:
+    User.objects.get(username=os.environ["ADMIN_USERNAME"])
+
+except:
+    user = User(username=os.environ["ADMIN_USERNAME"],
             email=os.environ["ADMIN_EMAIL"],
             is_staff=True,
             is_superuser=True,
@@ -13,5 +17,5 @@ user = User(username=os.environ["ADMIN_USERNAME"],
             )
 
 
-user.set_password(os.environ["ADMIN_PASSWORD"])
-user.save()
+    user.set_password(os.environ["ADMIN_PASSWORD"])
+    user.save()

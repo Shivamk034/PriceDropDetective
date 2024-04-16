@@ -3,7 +3,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "PriceDropDetective.settings")
 django.setup()
 
 import schedule,time,random
-from scraper.scraper import *
+from scraper import *
 from main.models import Product,Price,Track
 from email_utils import send_email,get_template_price_drop_email
 from django.urls import reverse
@@ -12,11 +12,11 @@ load_dotenv()
 
 
 
-def getScrapper(driver,url):
+def getScrapper(url):
     if("amazon" in url.lower()):
-        return AmazonScrapper(driver,url)
+        return AmazonScrapper(url)
     elif("flipkart" in url.lower()):
-        return FlipkartScrapper(driver,url)
+        return FlipkartScrapper(url)
     else:
         return None
 
@@ -25,17 +25,19 @@ def getScrapper(driver,url):
 
 def my_scheduled_job():
   time.sleep(random.randint(15*60,3*60*60))  # random interval scrape intervals
-  driver = getDriver()
   print("Started Scrapping")
   products = Product.objects.all()
   for i,product in enumerate(products):
     time.sleep(random.randint(5,10))  # random interval between requests
     print(f"Scrapping {i+1}th url out of {len(products)} urls!")
     try:
-      scrapper = getScrapper(driver,product.url)
+      scrapper = getScrapper(product.url)
       product_price=scrapper.getPrice()
       if(product_price!=None):
         last_price = product.price_set.last()   # last scrapped price for this product
+        if not Price.isValidPrice(product_price):
+           raise Exception(f"invalid price :{product_price}")  
+        
         price = Price(price=product_price,product=product)
         price.save()
         
@@ -56,10 +58,10 @@ def my_scheduled_job():
 
       else:
         scrapper.takeScreenshot()
-        print("couldn't scrap price of product id:",product.id)
+        print("couldn't scrap price of product id & title:",product.id,product.title)
          
     except Exception as e:
-      print("Error while scrapping product id:",product.id)
+      print("Error while scrapping product id & title:",product.id,product.title)
       print(e)
   
   print("Scrapping Finished")

@@ -1,57 +1,27 @@
 from abc import ABC, abstractmethod 
-from selenium import webdriver
-from selenium.webdriver.common.by import By
 from fake_useragent import UserAgent
 from pathlib import Path
-import os
-from datetime import datetime
-import requests, shutil ,uuid, random
-# from bs4 import BeautifulSoup
-
+import os, random, requests
+from datetime import datetime 
+from bs4 import BeautifulSoup
+import base64, io, numpy as np
+from PIL import Image
+import cv2
 
 ua = UserAgent(platforms="pc")
 
 log_dir=Path("logs/images/")
 if not os.path.exists(log_dir): os.makedirs(log_dir)
 
-def getOptions():
-    chrome_options = webdriver.ChromeOptions() # Create object ChromeOptions()
-    chrome_options.add_argument('--headless')           
-    # chrome_options.add_argument('--headless=new')           
-    chrome_options.add_argument('--no-sandbox')                             
-    chrome_options.add_argument('--disable-dev-shm-usage')
-    chrome_options.add_argument("--log-level=0")
-    chrome_options.add_argument('--ignore-certificate-errors')
-    chrome_options.add_argument('--incognito')
-    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-    chrome_options.add_argument("--disable-javascript")
-    chrome_options.add_argument("--disable-gpu")
-    chrome_options.add_argument("--disable-blink-settings=imagesEnabled=false")
-    chrome_options.add_argument("--window-size=1920,1080")
-    chrome_options.add_argument(f"user-agent={ua.random}")
-    prefs = {"profile.managed_default_content_settings.images": 2}
-    chrome_options.add_experimental_option("prefs", prefs)
-    return chrome_options
-
-def getDriver():
-    # Set up the Chrome driver
-    driver = webdriver.Chrome(options=getOptions())
-    # webdriver.
-    # driver.set_window_size(2220,1080)
-    # driver.maximize_window()
-    # if driver:  driver.close()
-    return driver
-
 
 apis = [
-  # "https://anuj-panthri-puppeteer-api.hf.space/html/",
-  "https://anuj-panthri-puppeteer-api-1.hf.space/html/",
-  "https://anuj-panthri-puppeteer-api-2.hf.space/html/",
-  "https://shivam-kala-puppeteer-api-3.hf.space/html/",
-  "https://shivam-kala-puppeteer-api-4.hf.space/html/",
+  "https://anuj-panthri-puppeteer-api-1.hf.space/screenshot/",
+  "https://anuj-panthri-puppeteer-api-2.hf.space/screenshot/",
+  "https://shivam-kala-puppeteer-api-3.hf.space/screenshot/",
+  "https://shivam-kala-puppeteer-api-4.hf.space/screenshot/",
   ]
 
-def getHTMLFROMAPI(url):
+def getHTMLFROMAPI(url) -> tuple[str, str]:
     
     api = apis[random.randint(0,len(apis)-1)]
 
@@ -60,7 +30,6 @@ def getHTMLFROMAPI(url):
         "Accept-Encoding": "gzip, deflate, br",
         "Cache-Control": "max-age=0",
         "Connection": "keep-alive",
-        # "User-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Safari/605.1.15",
         "User-agent": ua.random
     }
     data = {
@@ -68,22 +37,24 @@ def getHTMLFROMAPI(url):
         "headers":headers,
     }
     print("using_api:",api)
-    res = requests.post(api,data=data).json()
-    return (res["html"]).encode("UTF-8")
+    try:
+        res = requests.post(api,data=data).json()
+    except Exception as e:
+        print("error while hitting puppeteer api")
+
+    return (res["html"]).encode("UTF-8"), res["base64"].encode("UTF-8")
 
 class BaseScrapper(ABC):
-    def __init__(self,driver:webdriver.Chrome,url):
-        self.driver = driver
+    def __init__(self,url):
         self.updateUrl(url)
-
-    # def __del__(self):
-    #     print("Destructor called !")
-    #     self.driver.close()
 
     def takeScreenshot(self):
         cur_time = datetime.now()
         img_path = log_dir/Path(f"{cur_time.day}-{cur_time.month}-{cur_time.year}--{cur_time.hour}-{cur_time.minute}-{cur_time.second}.png")
-        self.driver.save_screenshot(img_path)
+        bytes_array = io.BytesIO(base64.b64decode(self.base64))
+        image = np.array(Image.open(bytes_array).convert("RGB"))
+        cv2.imwrite(str(img_path),image[:,:,::-1])
+        
 
     @classmethod
     def getBaseUrl(cls,url):
@@ -94,29 +65,13 @@ class BaseScrapper(ABC):
         return url
     
     def updateUrl(self,url):
-        self.url=url
-        
+        self.url=url 
         # gethtml from api and make a temp html file out of it
-        html = getHTMLFROMAPI(url)
-        temp_dir = Path("temp/")
-        if not os.path.exists(temp_dir): os.makedirs(temp_dir)
-
-        html_path = temp_dir/Path(f"{str(uuid.uuid1())}.html")
-        open(html_path,'wb').write(html)
-        html_path = str(html_path.absolute()).replace("\\","/")
-        print(html_path)
-        
-        self.driver.get("file:///"+html_path)
-        # file:///D:/projects/html%20&%20JS%20projects/PriceDropDetective/temp/index.html
-        # self.driver
-        # delete temp dir
-        shutil.rmtree(temp_dir)
-        
+        self.html,self.base64 = getHTMLFROMAPI(url)    
+        self.soup = BeautifulSoup(self.html, "html.parser")
 
     def getHTML(self):
-        return self.driver.page_source.encode("UTF-8")
-
-
+        return self.html
 
     @abstractmethod
     def getPrice(self):
@@ -130,11 +85,8 @@ class BaseScrapper(ABC):
     def getImage(self):
         pass
 
-
-
 def error_handler(f):
     def exec(*args,**kwargs):
-        # self=args[0]
         try:
             # print(self)
             return f(*args,**kwargs)
@@ -144,15 +96,15 @@ def error_handler(f):
     return exec
 
 class AmazonScrapper(BaseScrapper):
-    def __init__(self,driver,url):
-        super().__init__(driver,url)
+    def __init__(self,url):
+        super().__init__(url)
 
     @staticmethod
     def _get_asin(url):
         parts = url.split("/dp/",1)[-1].split("/",1)
         return parts[0] if isinstance(parts,list) else parts
     
-    
+   
     @classmethod
     def getShortUrl(cls,url):
         asin = cls._get_asin(url)
@@ -160,25 +112,39 @@ class AmazonScrapper(BaseScrapper):
     
     @error_handler
     def getTitle(self):
-        return self.driver.find_element(By.XPATH, '//*[@id="productTitle"]').text
+        return self.soup.find("span",{"id":"productTitle"}).text.strip()
     
     @error_handler
     def getPrice(self):
         
-        base_selector=""".//div[@id="corePriceDisplay_desktop_feature_div" or @id="corePrice_desktop"]//div[contains(concat(" ",normalize-space(@class)," ")," a-section ")]//span[contains(concat(" ",normalize-space(@class)," ")," a-price ")]"""
+        base_element = self.soup.find("div",{"id":"corePriceDisplay_desktop_feature_div"})
+        if(base_element is None):
+            base_element = self.soup.find("div",{"id":"corePrice_desktop"})
+
+        base_element = base_element.find("div",{"class":"a-section"}).find("span",{"class":"a-price"})
+
+
+        # removing unnecessary elements
+        offscreen_element = base_element.find("span",{"class":"a-offscreen"})
+        decimal_element = base_element.find("span",{"class":"a-price-decimal"})
+        if (offscreen_element):    offscreen_element.extract()
+        if (decimal_element):    decimal_element.extract()
+        
+        # print(base_element)
+
         try:
-            symbol= self.driver.find_element(By.XPATH,base_selector+'//span[contains(concat(" ",normalize-space(@class)," ")," a-price-symbol ")]').text
-            whole= self.driver.find_element(By.XPATH,base_selector+'//span[contains(concat(" ",normalize-space(@class)," ")," a-price-whole ")]').text
+            symbol= base_element.find("span",{"class":"a-price-symbol"}).text
+            whole = base_element.find("span",{"class":"a-price-whole"}).text
             decimal= '.'
-            fraction= self.driver.find_element(By.XPATH,base_selector+'//span[contains(concat(" ",normalize-space(@class)," ")," a-price-fraction ")]').text
+            fraction = base_element.find("span",{"class":"a-price-fraction"}).text
             return symbol + whole + decimal + fraction
         except:
-            return self.driver.find_element(By.XPATH, base_selector).text 
+            return base_element.text
         
         
     @error_handler
     def getImage(self):
-        return self.driver.find_element(By.XPATH, '//*[@id="landingImage"]').get_attribute('src')
+        return self.soup.find("img",{"id":"landingImage"}).get("src")
         
     def getData(self):
         data = {
@@ -191,8 +157,8 @@ class AmazonScrapper(BaseScrapper):
         return data
 
 class FlipkartScrapper(BaseScrapper):
-    def __init__(self,driver,url):
-        super().__init__(driver,url)
+    def __init__(self,url):
+        super().__init__(url)
     
     @classmethod
     def getShortUrl(cls,url):
@@ -200,19 +166,15 @@ class FlipkartScrapper(BaseScrapper):
     
     @error_handler
     def getTitle(self):
-        # return self.driver.find_element(By.XPATH, '//*[@id="container"]/div/div[3]/div[1]/div[2]/div[2]/div/div[1]/h1/span[2]').text
-        return self.driver.find_element(By.CSS_SELECTOR,"span.B_NuCI").text
-
+        return self.soup.find("span",{"class":"B_NuCI"}).text.strip()
         
     @error_handler
     def getPrice(self):
-        return self.driver.find_element(By.CSS_SELECTOR,"div._25b18c div._30jeq3").text
+        return self.soup.find("div",{"class":"_25b18c"}).find("div",{"class":"_30jeq3"}).text
 
-    
     @error_handler
     def getImage(self):
-        return self.driver.find_element(By.CSS_SELECTOR,"div._3kidJX img").get_attribute("src")
-
+        return self.soup.find("div",{"class":"_3kidJX"}).find("img").get("src")
         
     def getData(self):
         data = {
@@ -228,21 +190,22 @@ if __name__ == "__main__":
     # https://www.amazon.in/dp/B07WHQRN1B/
     # https://www.flipkart.com/p/itm3b20cdb30cb02
     # url = "https://www.amazon.in/dp/B07WHQRN1B/"
-    driver = getDriver()
 
     
-    url = "https://www.amazon.com/dp/B088SKYMF2/"
+    # url = "https://www.amazon.com/dp/B088SKYMF2/"
+    url = "https://www.amazon.com/dp/B0CYCKS9S4?th=1"
     # url = "https://www.amazon.com/dp/B08F2/"
     # url = "https://wasdasdzx2/"
 
     
     # print(getHTMLFROMAPI(url))
-    # scrapper = AmazonScrapper(driver,AmazonScrapper.getShortUrl(url))
-    # print(scrapper.url)
-    # data=scrapper.getData()
-    # print(data)
+    scrapper = AmazonScrapper(AmazonScrapper.getShortUrl(url))
+    print(scrapper.url)
+    data=scrapper.getData()
+    scrapper.takeScreenshot()
+    open("index.html","wb").write(scrapper.getHTML())
+    print(data)
     # # input("stop")
-    # driver.close()
     # exit()
 
     # url = "https://www.amazon.com/dp/B07PVCK9KX/"
@@ -263,8 +226,8 @@ if __name__ == "__main__":
     # print(scrapper.getData())
 
     url = 'https://www.flipkart.com/apple-iphone-15-blue-128-gb/p/itmbf14ef54f645d?pid=MOBGTAGPAQNVFZZY&lid=LSTMOBGTAGPAQNVFZZYO7HQ2L&marketplace=FLIPKART&store=tyy%2F4io&spotlightTagId=BestsellerId_tyy%2F4io&srno=b_1_1&otracker=browse&fm=organic&iid=fedd7fea-5ff7-4bd7-a5f0-a9008f1702c3.MOBGTAGPAQNVFZZY.SEARCH&ppt=browse&ppn=browse&ssid=7un6hxsq6o0000001710258321538'
-    scrapper = FlipkartScrapper(driver,FlipkartScrapper.getShortUrl(url))
-    open("index.html","wb").write(scrapper.getHTML())
+    scrapper = FlipkartScrapper(FlipkartScrapper.getShortUrl(url))
+    # open("index.html","wb").write(scrapper.getHTML())
     print(scrapper.url)
     print(scrapper.getData())
 

@@ -24,8 +24,19 @@ class Price(models.Model):
     def __str__(self):
         return f"{self.price}---------{self.product.title[:40]}"
     
-    def floatPrice(self,):  
-        return float(re.sub(r'[^0-9.]', '',self.price))
+    @staticmethod
+    def convertPrice(price):  
+        return float(re.sub(r'[^0-9.]', '',price))
+    @classmethod
+    def isValidPrice(cls,price):
+        try:
+            cls.convertPrice(price)
+            return True
+        except:
+            return False
+
+    def floatPrice(self):  
+        return self.convertPrice(self.price)
 
 
 class Track(models.Model):

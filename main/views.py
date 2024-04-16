@@ -2,15 +2,10 @@ from django.shortcuts import render,redirect,get_object_or_404
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
-from scraper.scraper import *
+from scraper import *
 from .models import Product,Price,Track
-import json
 import os
-from glob import glob
 from PIL import Image
-from pathlib import Path
-
-# from . import scheduled_jobs
 
 def getScrapper(url):
     if("amazon" in url.lower()):
@@ -34,19 +29,16 @@ def add_product(request):
         return render(request,"main/main_screen.html",context={})
 
     elif(request.method=="POST"):
-        # print(request.POST)
         # check if url is supported
         scrapperClass = getScrapper(request.POST["url"])
         
         if(scrapperClass==None):
             # EXPERIMENT !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            # driver = getDriver()
-            # scrapper = AmazonScrapper(driver,request.POST["url"])
+            # scrapper = AmazonScrapper(request.POST["url"])
             # scrapper.getData()
             return render(request,"main/main_screen.html",context={"error":"unsupported url"})
         
         try:
-            # url = (request.POST["url"])
             url = scrapperClass.getShortUrl(request.POST["url"])
             print("url:",url)
         except:
@@ -57,12 +49,10 @@ def add_product(request):
         track = Track.objects.filter(user=request.user,product__url=url)
         if(len(track)>0):
             return render(request,"main/main_screen.html",context={"error":"already tracking this url"})
-        
-        driver = getDriver()
 
         # handling when driver is unable to get the page (the url might be wrong)
         try:
-            scrapper = scrapperClass(driver,url)
+            scrapper = scrapperClass(url)
         except Exception as e:
             print(e)
             return render(request,"main/main_screen.html",context={"error":"invalid url"})
@@ -75,8 +65,6 @@ def add_product(request):
             return redirect(reverse("detail",kwargs={"id":old_prod[0].id}))
     
         data = scrapper.getData()
-        driver.close()
-        # print(data)
 
         if(data["title"]==None):
             print("title error")
@@ -87,10 +75,11 @@ def add_product(request):
         if(data["image"]==None):
             print("image error")
             return render(request,"main/main_screen.html",context={"error":"Failed to fetch data"})
-
+    
+        if not Price.isValidPrice(data['price']):  
+            return render(request,"main/main_screen.html",context={"error":"something went wrong"})
         
         # save product
-        # print(request.user)
         product = Product(
             url=url,
             title=data["title"],
@@ -109,6 +98,8 @@ def add_product(request):
             price=data['price']
         )
         price.save()
+        
+            
 
         return redirect(reverse("detail",kwargs={"id":product.id}))
 
