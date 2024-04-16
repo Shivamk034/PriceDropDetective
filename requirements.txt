@@ -1,9 +1,11 @@
+beautifulsoup4==4.12.3
+Django==4.1.13
+fake_useragent==1.5.0
+numpy==1.26.4
+opencv_python==4.9.0.80
+Pillow==10.3.0
 python-dotenv==1.0.1
 Requests==2.31.0
 schedule==1.2.1
-django-allauth==0.61.1
-fake_useragent
-django-cors-headers
-pillow
 # psycopg2
 psycopg2-binary
