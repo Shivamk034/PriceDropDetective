@@ -1,3 +1,4 @@
+
 numpy
 Django==5.0.2
 python-dotenv==1.0.1
@@ -6,8 +7,10 @@ schedule==1.2.1
 django-allauth==0.61.1
 fake_useragent
 django-cors-headers
+# opencv-python
+opencv_python==4.9.0.80
+
 pillow
-opencv-python
 # psycopg2
 psycopg2-binary
 beautifulsoup4==4.12.3
