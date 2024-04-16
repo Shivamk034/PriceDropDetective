@@ -1,6 +1,6 @@
 Django==4.1.13
 fake_useragent==1.5.0
-numpy==1.26.4
+numpy
 opencv_python
 Pillow==9.5.0
 Pillow==10.3.0
