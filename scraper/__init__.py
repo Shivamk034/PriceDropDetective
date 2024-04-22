@@ -166,15 +166,15 @@ class FlipkartScrapper(BaseScrapper):
     
     @error_handler
     def getTitle(self):
-        return self.soup.find("span",{"class":"B_NuCI"}).text.strip()
+        return self.soup.find("span",{"class":"VU-ZEz"}).text.strip()
         
     @error_handler
     def getPrice(self):
-        return self.soup.find("div",{"class":"_25b18c"}).find("div",{"class":"_30jeq3"}).text
+        return self.soup.find("div",{"class":"hl05eU"}).find("div",{"class":"CxhGGd"}).text
 
     @error_handler
     def getImage(self):
-        return self.soup.find("div",{"class":"_3kidJX"}).find("img").get("src")
+        return self.soup.find("div",{"class":"_6lpKCl"}).find("img").get("src")
         
     def getData(self):
         data = {
@@ -193,18 +193,18 @@ if __name__ == "__main__":
 
     
     # url = "https://www.amazon.com/dp/B088SKYMF2/"
-    # url = "https://www.amazon.com/dp/B0CYCKS9S4?th=1"
+    url = "https://www.amazon.com/dp/B0CYCKS9S4?th=1"
     # url = "https://www.amazon.com/dp/B08F2/"
     # url = "https://wasdasdzx2/"
 
     
     # print(getHTMLFROMAPI(url))
-    # scrapper = AmazonScrapper(AmazonScrapper.getShortUrl(url))
-    # print(scrapper.url)
-    # data=scrapper.getData()
+    scrapper = AmazonScrapper(AmazonScrapper.getShortUrl(url))
+    print(scrapper.url)
+    data=scrapper.getData()
+    print(data)
     # scrapper.takeScreenshot()
     # open("index.html","wb").write(scrapper.getHTML())
-    # print(data)
     # # input("stop")
     # exit()
 
