@@ -70,7 +70,8 @@ def my_scheduled_job():
 
 
 
-schedule.every(int(os.environ["SCRAPING_INTERVAL"])).minutes.do(my_scheduled_job)
+# schedule.every(int(os.environ["SCRAPING_INTERVAL"])).minutes.do(my_scheduled_job)
+schedule.every(1).minutes.do(my_scheduled_job)
 while True:
   schedule.run_pending()
   time.sleep(1)
