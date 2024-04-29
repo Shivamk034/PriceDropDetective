@@ -111,6 +111,9 @@ DATABASES = {
         'USER': os.environ["PGUSER"],
         'PASSWORD': os.environ["PGPASSWORD"],
         'HOST': os.environ["PGHOST"],
+        'OPTIONS': {
+            'sslmode': 'require',
+        }
         # 'PORT': os.environ["PGPORT"],
     }
 }

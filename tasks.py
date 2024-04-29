@@ -24,11 +24,11 @@ def getScrapper(url):
 # 9,15,21,24 
 
 def my_scheduled_job():
-  time.sleep(random.randint(15*60,3*60*60))  # random interval scrape intervals
+  # time.sleep(random.randint(15*60,3*60*60))  # random interval scrape intervals
   print("Started Scrapping")
   products = Product.objects.all()
   for i,product in enumerate(products):
-    time.sleep(random.randint(5,10))  # random interval between requests
+    # time.sleep(random.randint(5,10))  # random interval between requests
     print(f"Scrapping {i+1}th url out of {len(products)} urls!")
     try:
       scrapper = getScrapper(product.url)
@@ -42,8 +42,10 @@ def my_scheduled_job():
         price.save()
         
         # check if price dropped
-        if(price.floatPrice()<last_price.floatPrice()):
+        print("price check")
+        if(price.floatPrice() <= last_price.floatPrice()):
           # send email
+          print("inside if block")
           recipients = [track.user for track in product.track_set.all()]
           for user in recipients:
             template = get_template_price_drop_email(
