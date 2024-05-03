@@ -190,8 +190,12 @@ if __name__ == "__main__":
     # https://www.amazon.in/dp/B07WHQRN1B/
     # https://www.flipkart.com/p/itm3b20cdb30cb02
     # url = "https://www.amazon.in/dp/B07WHQRN1B/"
+    html,base64_str = getHTMLFROMAPI("https://bot.sannysoft.com/")
 
-    
+    bytes_array = io.BytesIO(base64.b64decode(base64_str))
+    image = np.array(Image.open(bytes_array).convert("RGB"))
+    Image.fromarray(image).save("img_path.jpg")
+
     # url = "https://www.amazon.com/dp/B088SKYMF2/"
     url = "https://www.amazon.com/dp/B0CYCKS9S4?th=1"
     # url = "https://www.amazon.com/dp/B08F2/"

@@ -24,11 +24,11 @@ def getScrapper(url):
 # 9,15,21,24 
 
 def my_scheduled_job():
-  # time.sleep(random.randint(15*60,3*60*60))  # random interval scrape intervals
+  time.sleep(random.randint(15*60,3*60*60))  # random interval scrape intervals
   print("Started Scrapping")
   products = Product.objects.all()
   for i,product in enumerate(products):
-    # time.sleep(random.randint(5,10))  # random interval between requests
+    time.sleep(random.randint(5,10))  # random interval between requests
     print(f"Scrapping {i+1}th url out of {len(products)} urls!")
     try:
       scrapper = getScrapper(product.url)
@@ -68,10 +68,10 @@ def my_scheduled_job():
   
   print("Scrapping Finished")
 
-
-
-# schedule.every(int(os.environ["SCRAPING_INTERVAL"])).minutes.do(my_scheduled_job)
-schedule.every(1).minutes.do(my_scheduled_job)
+# print("HELLLOOOOO")
+# https://bot.sannysoft.com/
+schedule.every(int(os.environ["SCRAPING_INTERVAL"])).minutes.do(my_scheduled_job)
+# schedule.every(1).minutes.do(my_scheduled_job)
 while True:
   schedule.run_pending()
   time.sleep(1)
