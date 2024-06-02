@@ -68,7 +68,6 @@ def my_scheduled_job():
   
   print("Scrapping Finished")
 
-# print("HELLLOOOOO")
 # https://bot.sannysoft.com/
 schedule.every(int(os.environ["SCRAPING_INTERVAL"])).minutes.do(my_scheduled_job)
 # schedule.every(1).minutes.do(my_scheduled_job)
