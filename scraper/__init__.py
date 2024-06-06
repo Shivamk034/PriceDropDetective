@@ -47,7 +47,7 @@ def getHTMLFROMAPI(url) -> tuple[str, str]:
         logging.error(f"Error parsing JSON response for URL {url}: {e}")
         res = {"html": "", "base64": ""}
 
-    return res["html"].encode("UTF-8"), res["base64"].encode("UTF-8")
+    return (res["html"]).encode("UTF-8"), res["base64"].encode("UTF-8")
 
 class BaseScrapper(ABC):
     def __init__(self,url):
