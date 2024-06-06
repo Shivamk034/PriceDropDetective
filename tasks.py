@@ -11,6 +11,7 @@ from scraper import AmazonScrapper, FlipkartScrapper
 from main.models import Product, Price, Track
 from email_utils import send_email, get_template_price_drop_email
 from django.urls import reverse
+from django.db import OperationalError, InterfaceError, connection
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -28,6 +29,11 @@ def get_scrapper(url):
 def process_product(product):
     try:
         scrapper = get_scrapper(product.url)
+        
+        if scrapper is None:
+            logging.info(f"Skipping product with URL: {product.url}")
+            return
+        
         product_price = scrapper.getPrice()
 
         if product_price is not None:
@@ -54,31 +60,46 @@ def process_product(product):
             scrapper.takeScreenshot()
             logging.warning(f"Couldn't scrap price of product id & title: {product.id}, {product.title}")
 
+    except InterfaceError as e:
+        logging.error(f"Database interface error while scrapping product id & title: {product.id}, {product.title}")
+        logging.exception(e)
+        connection.close()  # Ensure connection is closed
+    except OperationalError as e:
+        logging.error(f"Database error while scrapping product id & title: {product.id}, {product.title}")
+        logging.exception(e)
+        connection.close()  # Ensure connection is closed
     except Exception as e:
         logging.error(f"Error while scrapping product id & title: {product.id}, {product.title}")
         logging.exception(e)
 
 def my_scheduled_job():
-    interval = random.randint(15 * 60, 3 * 60 * 60)
-    logging.info(f"Sleeping for {interval} seconds before starting the scrape.")
-    time.sleep(interval)
-    
-    logging.info("Started Scrapping")
-    products = Product.objects.all()
-    
-    with ThreadPoolExecutor(max_workers=3) as executor:
-        futures = [executor.submit(process_product, product) for product in products]
-        for future in futures:
-            try:
-                future.result()
-            except Exception as e:
-                logging.error(f"Error processing a product: {e}")
-
-    logging.info("Scrapping Finished")
+    # interval = random.randint(15 * 60, 3 * 60 * 60)
+    # logging.info(f"Sleeping for {interval} seconds before starting the scrape.")
+    # time.sleep(interval)
+    try:
+        products = Product.objects.all()
+        for product in products:
+            if "amazon" not in product.url.lower():
+                process_product(product)
+    except Exception as e:
+        logging.error("Error in the scheduler loop.")
+        logging.exception(e)
 
 schedule.every(int(os.environ["SCRAPING_INTERVAL"])).minutes.do(my_scheduled_job)
 
 if __name__ == "__main__":
     while True:
-        schedule.run_pending()
+        try:
+            schedule.run_pending()
+        except OperationalError as e:
+            logging.error("OperationalError in the scheduler loop.")
+            logging.exception(e)
+            connection.close()  # Ensure connection is closed
+        except InterfaceError as e:
+            logging.error("InterfaceError in the scheduler loop.")
+            logging.exception(e)
+            connection.close()  # Ensure connection is closed
+        except Exception as e:
+            logging.error("Unexpected error in the scheduler loop.")
+            logging.exception(e)
         time.sleep(1)
