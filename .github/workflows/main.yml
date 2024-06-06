@@ -17,7 +17,5 @@ jobs:
       - name: Push to hub
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-          HF_TOKEN_AP: ${{ secrets.HF_TOKEN_AP }}
         run: |
-          git push https://anuj-panthri:$HF_TOKEN_AP@huggingface.co/spaces/anuj-panthri/price-drop-detective main --force
           git push https://shivam-kala:$HF_TOKEN@huggingface.co/spaces/shivam-kala/price-drop-detective main --force
