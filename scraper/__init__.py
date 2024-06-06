@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod 
 from fake_useragent import UserAgent
 from pathlib import Path
-import os, random, requests
+import os, random, requests, logging
 from datetime import datetime 
 from bs4 import BeautifulSoup
 import base64, io, numpy as np
@@ -35,13 +35,19 @@ def getHTMLFROMAPI(url) -> tuple[str, str]:
         "url":url,
         "headers":headers,
     }
-    print("using_api:",api)
+    logging.info("using_api:",api)
     try:
-        res = requests.post(api,data=data).json()
-    except Exception as e:
-        print("error while hitting puppeteer api")
+        response = requests.post(api, data=data)
+        response.raise_for_status()  # Raise an HTTPError for bad responses
+        res = response.json()
+    except requests.RequestException as e:
+        logging.error(f"Error while hitting puppeteer API for URL {url}: {e}")
+        res = {"html": "", "base64": ""}  # Ensure res is defined
+    except ValueError as e:  # In case response is not JSON
+        logging.error(f"Error parsing JSON response for URL {url}: {e}")
+        res = {"html": "", "base64": ""}
 
-    return (res["html"]).encode("UTF-8"), res["base64"].encode("UTF-8")
+    return res["html"].encode("UTF-8"), res["base64"].encode("UTF-8")
 
 class BaseScrapper(ABC):
     def __init__(self,url):
