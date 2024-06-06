@@ -35,7 +35,7 @@ def getHTMLFROMAPI(url) -> tuple[str, str]:
         "url":url,
         "headers":headers,
     }
-    logging.info("using_api:",api)
+    logging.info("using_api: %s", api)
     try:
         response = requests.post(api, data=data)
         response.raise_for_status()  # Raise an HTTPError for bad responses
