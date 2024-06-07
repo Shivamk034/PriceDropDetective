@@ -6,12 +6,11 @@ import schedule
 import time
 import random
 import logging
-from concurrent.futures import ThreadPoolExecutor
 from scraper import AmazonScrapper, FlipkartScrapper
 from main.models import Product, Price, Track
 from email_utils import send_email, get_template_price_drop_email
 from django.urls import reverse
-from django.db import OperationalError, InterfaceError, connection
+from django.db import OperationalError, InterfaceError
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -63,15 +62,13 @@ def process_product(product):
     except InterfaceError as e:
         logging.error(f"Database interface error while scrapping product id & title: {product.id}, {product.title}")
         logging.exception(e)
-        connection.close()  # Ensure connection is closed
     except OperationalError as e:
         logging.error(f"Database error while scrapping product id & title: {product.id}, {product.title}")
         logging.exception(e)
-        connection.close()  # Ensure connection is closed
     except Exception as e:
         logging.error(f"Error while scrapping product id & title: {product.id}, {product.title}")
         logging.exception(e)
-
+               
 def my_scheduled_job():
     # interval = random.randint(15 * 60, 3 * 60 * 60)
     # logging.info(f"Sleeping for {interval} seconds before starting the scrape.")
@@ -94,11 +91,9 @@ if __name__ == "__main__":
         except OperationalError as e:
             logging.error("OperationalError in the scheduler loop.")
             logging.exception(e)
-            connection.close()  # Ensure connection is closed
         except InterfaceError as e:
             logging.error("InterfaceError in the scheduler loop.")
             logging.exception(e)
-            connection.close()  # Ensure connection is closed
         except Exception as e:
             logging.error("Unexpected error in the scheduler loop.")
             logging.exception(e)

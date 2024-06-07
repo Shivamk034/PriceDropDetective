@@ -111,6 +111,7 @@ DATABASES = {
         'USER': os.environ["PGUSER"],
         'PASSWORD': os.environ["PGPASSWORD"],
         'HOST': os.environ["PGHOST"],
+        'CONN_MAX_AGE': 25200,
         'OPTIONS': {
             'sslmode': 'require',
         }
