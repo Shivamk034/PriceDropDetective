@@ -8,6 +8,7 @@
 __pycache__/
 local_settings.py
 db.sqlite3
+backup_dir
 db.sqlite3-journal
 media
 

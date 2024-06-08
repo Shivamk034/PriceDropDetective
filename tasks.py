@@ -43,7 +43,7 @@ def process_product(product):
             price = Price(price=product_price, product=product)
             price.save()
 
-            if price.floatPrice() < last_price.floatPrice():
+            if price.floatPrice() <= last_price.floatPrice():
                 recipients = [track.user for track in product.track_set.all()]
                 for user in recipients:
                     template = get_template_price_drop_email(
@@ -98,3 +98,31 @@ if __name__ == "__main__":
             logging.error("Unexpected error in the scheduler loop.")
             logging.exception(e)
         time.sleep(1)
+        
+# 2024-06-07 17:19:04,968 - ERROR - Error while scrapping product id & title: 19, Noise Icon 4 with Stunning 1.96'' AMOLED Display, Metallic Finish, BT Calling Smartwatch  (Forest Green Strap, Regular)
+# 2024-06-07 17:19:04,968 - ERROR - [Errno 101] Network is unreachable
+# Traceback (most recent call last):
+#   File "/app/tasks.py", line 57, in process_product
+#     send_email(subject=template["subject"], body=template["body"], recipients=user.email)
+#   File "/app/email_utils.py", line 19, in send_email
+#     with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp_server:
+#          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#   File "/usr/local/lib/python3.12/smtplib.py", line 1022, in __init__
+#     SMTP.__init__(self, host, port, local_hostname, timeout,
+#   File "/usr/local/lib/python3.12/smtplib.py", line 255, in __init__
+#     (code, msg) = self.connect(host, port)
+#                   ^^^^^^^^^^^^^^^^^^^^^^^^
+#   File "/usr/local/lib/python3.12/smtplib.py", line 341, in connect
+#     self.sock = self._get_socket(host, port, self.timeout)
+#                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#   File "/usr/local/lib/python3.12/smtplib.py", line 1028, in _get_socket
+#     new_socket = super()._get_socket(host, port, timeout)
+#                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#   File "/usr/local/lib/python3.12/smtplib.py", line 312, in _get_socket
+#     return socket.create_connection((host, port), timeout,
+#            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#   File "/usr/local/lib/python3.12/socket.py", line 852, in create_connection
+#     raise exceptions[0]
+#   File "/usr/local/lib/python3.12/socket.py", line 837, in create_connection
+#     sock.connect(sa)
+# OSError: [Errno 101] Network is unreachable
