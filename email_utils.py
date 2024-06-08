@@ -1,3 +1,4 @@
+from typing import Union
 import smtplib, ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -11,12 +12,13 @@ load_dotenv()
 sender_email = os.environ["SENDER_EMAIL"]
 sender_password = os.environ["SENDER_EMAIL_PASSWORD"]
 
-def send_email(subject:str, body:str, recipients:list|str):
+def send_email(subject:str, body:str, recipients:Union[list,str]):
     if(isinstance(recipients,str)): recipients = [recipients]
     
     
     
-    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp_server:
+    with smtplib.SMTP('smtp.gmail.com', 587) as smtp_server:
+       smtp_server.starttls()
        smtp_server.login(sender_email, sender_password)
        
        for recipient in recipients: # loop through the recipients List
@@ -57,6 +59,7 @@ Thank you for using Price Drop Detective!
 Best regards,
 Your Price Drop Detective Team
  """
+
 
     return {
         "subject":subject,
