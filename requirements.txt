@@ -13,3 +13,4 @@ beautifulsoup4==4.12.3
 huggingface_hub
 datasets
 GitPython
+sib_api_v3_sdk

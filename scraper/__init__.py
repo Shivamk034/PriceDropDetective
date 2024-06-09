@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod 
 from fake_useragent import UserAgent
 from pathlib import Path
-import os, random, requests, logging
+import os, random, requests
+from utils.logger import logger
 from datetime import datetime 
 from bs4 import BeautifulSoup
 import base64, io, numpy as np
@@ -35,17 +36,16 @@ def getHTMLFROMAPI(url) -> tuple[str, str]:
         "url":url,
         "headers":headers,
     }
-    logging.info("using_api: %s", api)
+    logger.info("using_api: %s", api)
+    res = {"html": None, "base64": None}  # Ensure res is defined
     try:
         response = requests.post(api, data=data)
         response.raise_for_status()  # Raise an HTTPError for bad responses
         res = response.json()
     except requests.RequestException as e:
-        logging.error(f"Error while hitting puppeteer API for URL {url}: {e}")
-        res = {"html": "", "base64": ""}  # Ensure res is defined
+        logger.error(f"Error while hitting puppeteer API for URL {url}: {e}")
     except ValueError as e:  # In case response is not JSON
-        logging.error(f"Error parsing JSON response for URL {url}: {e}")
-        res = {"html": "", "base64": ""}
+        logger.error(f"Error parsing JSON response for URL {url}: {e}")
 
     return (res["html"]).encode("UTF-8"), res["base64"].encode("UTF-8")
 
@@ -54,13 +54,15 @@ class BaseScrapper(ABC):
         self.updateUrl(url)
 
     def takeScreenshot(self):
-        cur_time = datetime.now()
-        img_path = log_dir/Path(f"{cur_time.day}-{cur_time.month}-{cur_time.year}--{cur_time.hour}-{cur_time.minute}-{cur_time.second}.png")
-        bytes_array = io.BytesIO(base64.b64decode(self.base64))
-        image = np.array(Image.open(bytes_array).convert("RGB"))
-        Image.fromarray(image).save(img_path)
-        
-        
+        if self.base64 is not None:
+            logger.info("taking screenshot")
+            cur_time = datetime.now()
+            img_path = log_dir/Path(f"{cur_time.day}-{cur_time.month}-{cur_time.year}--{cur_time.hour}-{cur_time.minute}-{cur_time.second}.png")
+            bytes_array = io.BytesIO(base64.b64decode(self.base64))
+            image = Image.open(bytes_array).convert("RGB")
+            image.save(img_path)
+        else:
+            logger.error("can't take screenshot cuz error while calling puppeteer api")
 
     @classmethod
     def getBaseUrl(cls,url):
