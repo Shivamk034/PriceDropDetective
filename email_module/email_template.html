@@ -6,31 +6,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
-
+        body{
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        pre{
+            font-family: inherit;
+        }
     </style>
 </head>
 
 <body>
-    <p>
+<p>
+Hello, {{name}}
 
-        Hello, {name}
+<p>We are excited to inform you that the price of the product you have been monitoring has dropped!</p>
 
-    <p>We are excited to inform you that the price of the product you have been monitoring has dropped!</p>
+<pre>
+Product Name: {{product_name}}
+Previous Price: {{previous_price}}
+New Price: {{new_price}}
+Buy Product: {{product_url}}
+Product Detail: https://shivam-kala-price-drop-detective.hf.space{{product_detail_url}}
+Hurry up and grab this opportunity before the price changes again!
 
-    <pre>
-        Product Name: {product_name}
-        Previous Price: {previous_price}
-        New Price: {new_price}
-        Buy Product: {product_url}
-        Product Detail: https://shivam-kala-price-drop-detective.hf.space{product_detail_url}
-        Hurry up and grab this opportunity before the price changes again!
+Thank you for using Price Drop Detective!
 
-    Thank you for using Price Drop Detective!
-
-    Best regards,
-    Your Price Drop Detective Team
+Best regards,
+Your Price Drop Detective Team
 </pre>
-    </p>
+</p>
 </body>
 
 </html>
