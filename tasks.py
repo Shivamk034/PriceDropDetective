@@ -40,7 +40,7 @@ def process_product(product):
             price = Price(price=product_price, product=product)
             price.save()
 
-            if price.floatPrice() <= last_price.floatPrice():
+            if price.floatPrice() < last_price.floatPrice():
                 recipients = [track.user for track in product.track_set.all()]
                 for user in recipients:
                     template = get_template_price_drop_email(
